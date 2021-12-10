@@ -1,6 +1,6 @@
 # epx-results
 
-epx-result is a python package for interacting with FRED simulation results.
+epx-results is a Python package for interacting with FRED simulation results.
 
 
 ## Requirements
