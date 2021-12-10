@@ -1,51 +1,70 @@
 """
-testing suire for epistemixpy.results.job.FREDJob
+a testing suite for epxresults.job module
 """
 
 import pytest
-
+import sys
 import os
 import numpy as np
 
-from epistemixpy.results.job import (
+from epxresults.job import (
     FREDJob
-)
-
-default_fred_results = os.path.abspath('./fred-results')
-
-
-@pytest.fixture(autouse=True)
-def set_fred_env_vars(monkeypatch):
-    monkeypatch.setenv('FRED_RESULTS', default_fred_results)
+    )
+from epxresults.utils import (
+    return_job_id
+    )
 
 
-def test_job_init_1(simpleflu_job_results_dir):
+###############################
+# initializing FRED job objects
+###############################
+
+
+def test_1(pkg_test_env):
+    """
+    test init with job key
+    """
+    job = FREDJob(job_key='epx-results_simpleflu')
+    assert job.job_key == 'epx-results_simpleflu'
+
+
+def test_2(pkg_test_env):
+    """
+    test init with job key and explicit FRED_RESULTS
+    """
+    FRED_RESULTS = os.environ['FRED_RESULTS']
+    os.environ['FRED_RESULTS'] = ''
+    job = FREDJob(FRED_RESULTS=FRED_RESULTS, job_key='epx-results_simpleflu')
+    assert job.job_key == 'epx-results_simpleflu'
+
+
+def test_3(pkg_test_env):
+    """
+    test init with job ID
+    """
+    test_job_id = return_job_id(job_key='epx-results_simpleflu')
+    job = FREDJob(job_id=test_job_id)
+    assert job.job_key == 'epx-results_simpleflu'
+
+
+def test_4(pkg_test_env):
+    """
+    test init with job ID and explicit FRED_RESULTS
+    """
+    test_job_id = return_job_id(job_key='epx-results_simpleflu')
+    FRED_RESULTS = os.environ['FRED_RESULTS']
+    os.environ['FRED_RESULTS'] = ''
+    job = FREDJob(FRED_RESULTS=FRED_RESULTS, job_id=test_job_id)
+    assert job.job_key == 'epx-results_simpleflu'
+
+
+def test_5(pkg_test_env):
     """
     test init with path to job
     """
-    job = FREDJob(PATH_TO_JOB=str(simpleflu_job_results_dir))
-    assert job.path_to_job == str(simpleflu_job_results_dir)
-
-
-def test_job_init_2(fred_results):
-    """
-    test init with path to results
-    """
-    job = FREDJob(job_id=1,
-                  FRED_RESULTS=str(fred_results))
-    assert job.path_to_job == str(fred_results)+'/JOB/1'
-
-    job = FREDJob(job_key='epistemixpy_simpleflu',
-                  FRED_RESULTS=str(fred_results))
-    assert job.path_to_job == str(fred_results)+'/JOB/1'
-
-
-def test_job_init_3(monkeypatch):
-    """
-    test init with environmental FRED_RESULTS
-    """
-    job = FREDJob(job_id=1)
-    assert job.path_to_job == str(default_fred_results)+'/JOB/1'
-
-    job = FREDJob(job_key='epistemixpy_simpleflu')
-    assert job.path_to_job == str(default_fred_results)+'/JOB/1'
+    test_job_id = return_job_id(job_key='epx-results_simpleflu')
+    FRED_RESULTS = os.environ['FRED_RESULTS']
+    os.environ['FRED_RESULTS'] = ''
+    PATH_TO_JOB = os.path.join(FRED_RESULTS, 'JOB', str(test_job_id))
+    job = FREDJob(PATH_TO_JOB=PATH_TO_JOB)
+    assert job.job_key == 'epx-results_simpleflu'

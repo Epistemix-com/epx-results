@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./scripts/generate-fred-result-data
+
+tox -e py38

@@ -1,0 +1,25 @@
+comment {
+    Creates a global list variable, `g_list_of_case_count_by_age`, that
+    logs the number of cases in different age brackets.
+
+    Depends on agents being given a `my_age_bracket_index` personal variable
+    in the `AGE_BRACKET` condition.
+
+    An agent is considered to be a 'case' when they enter the `INF.E` state.
+}
+
+
+variables {
+    # Output only at the end of the simulation
+    global_list g_list_of_case_count_by_age
+    g_list_of_case_count_by_age.output = 1
+    g_list_of_case_count_by_age = list(0, 0, 0, 0, 0, 0, 0, 0)
+}
+
+
+state INF.E {
+    # Modify `INF.E` state so that agents entering it log that they are now a
+    # case within their age bracket in `g_list_of_case_count_by_age`.
+    g_list_of_case_count_by_age[my_age_bracket_index] = \
+        g_list_of_case_count_by_age[my_age_bracket_index] + 1
+}

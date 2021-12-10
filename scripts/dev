@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+echo "Building a development Docker image"
+docker build -t epistemixpy .
+
+echo "Starting a development container with code mounted to /epistemixpy in the container"
+docker run --rm -it --env-file .env -v $(pwd):/epistemixpy epistemixpy bash

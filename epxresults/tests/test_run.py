@@ -9,56 +9,80 @@ import numpy as np
 
 from epistemixpy.results.run import (
     FREDRun
-)
-
-default_fred_results = os.path.abspath('./fred-results')
-
-
-@pytest.fixture(autouse=True)
-def set_fred_env_vars(monkeypatch):
-    monkeypatch.setenv('FRED_RESULTS', default_fred_results)
+    )
+from epxresults.utils import (
+    return_job_id,
+    return_job_run_ids
+    )
 
 
-def test_run_init_1(simpleflu_run1_results_dir):
+###############################
+# initializing FRED run objects
+###############################
+
+
+def test_1(pkg_test_env):
     """
-    test init with path to run
+    test init with job key and run ID
     """
-    run = FREDRun(run_id=1, PATH_TO_RUN=str(simpleflu_run1_results_dir))
-    assert run.path_to_run == str(simpleflu_run1_results_dir)
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=1)
+    assert run.run_id == 1
+
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=2)
+    assert run.run_id == 2
+
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=3)
+    assert run.run_id == 3
 
 
-def test_run_init_2(simpleflu_job_results_dir):
+def test_2(pkg_test_env):
     """
-    test init with path to job
+    test init with job ID and run ID
     """
-    run = FREDRun(run_id=1,
-                  PATH_TO_JOB=str(simpleflu_job_results_dir))
-    assert run.path_to_run == str(simpleflu_job_results_dir)+'/OUT/RUN1'
+    test_job_id = return_job_id(job_key='epx-results_simpleflu')
 
-    run = FREDRun(run_id=1,
-                  PATH_TO_JOB=str(simpleflu_job_results_dir))
-    assert run.path_to_run == str(simpleflu_job_results_dir)+'/OUT/RUN1'
+    run = FREDRun(job_id=test_job_id, run_id=1)
+    assert run.run_id == 1
+
+    run = FREDRun(job_id=test_job_id, run_id=2)
+    assert run.run_id == 2
+
+    run = FREDRun(job_id=test_job_id, run_id=3)
+    assert run.run_id == 3
 
 
-def test_run_init_3(fred_results):
+def test_3(pkg_test_env):
     """
-    test init with path to results
+    test init with job key and run ID
     """
-    run = FREDRun(run_id=1, job_id=1,
-                  FRED_RESULTS=str(fred_results))
-    assert run.path_to_run == str(fred_results)+'/JOB/1/OUT/RUN1'
+    FRED_RESULTS = os.environ['FRED_RESULTS']
 
-    run = FREDRun(run_id=1, job_key='epistemixpy_simpleflu',
-                  FRED_RESULTS=str(fred_results))
-    assert run.path_to_run == str(fred_results)+'/JOB/1/OUT/RUN1'
+    os.environ['FRED_RESULTS'] = ''
+
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=1, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 1
+
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=2, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 2
+
+    run = FREDRun(job_key='epx-results_simpleflu', run_id=3, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 3
 
 
-def test_run_init_4(monkeypatch):
+def test_4(pkg_test_env):
     """
-    test init with environmental FRED_RESULTS
+    test init with job ID and run ID
     """
-    run = FREDRun(run_id=1, job_id=1)
-    assert run.path_to_run == str(default_fred_results)+'/JOB/1/OUT/RUN1'
+    FRED_RESULTS = os.environ['FRED_RESULTS']
+    test_job_id = return_job_id(job_key='epx-results_simpleflu')
 
-    run = FREDRun(run_id=1, job_key='epistemixpy_simpleflu')
-    assert run.path_to_run == str(default_fred_results)+'/JOB/1/OUT/RUN1'
+    os.environ['FRED_RESULTS'] = ''
+
+    run = FREDRun(job_id=test_job_id, run_id=1, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 1
+
+    run = FREDRun(job_id=test_job_id, run_id=2, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 2
+
+    run = FREDRun(job_id=test_job_id, run_id=3, FRED_RESULTS=FRED_RESULTS)
+    assert run.run_id == 3
