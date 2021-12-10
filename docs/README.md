@@ -4,16 +4,16 @@ The documentation for this project is built with [Sphinx](https://www.sphinx-doc
 
 ## building the docs locally
 
-To build the documentation for epx-results locally, executyethe following command:
+To build the documentation for epx-results locally, execute the following command:
 
 ```terminal
 make html
 ```
 
-Ths builds the documentaiton in `./_build/html`. On a Mac, this can be opened in a browser by:
+This builds the documentation in `./_build/html`. On a Mac, this can be opened in a browser by:
 
 ```terminal
-open _build/html/index
+open _build/html/index.html
 ```
 
 ### Requirements
