@@ -1,5 +1,5 @@
 """
-This script generates test FRED model data into a local FRZED results
+This script generates test FRED model data into a local FREED results
 directory, PKG_TESTS_DIRECTORY, (which is .gitignore'd) so that the unit
 tests in this package have realistic data to work against.
 
@@ -32,22 +32,6 @@ test_models = {'simpleflu': 'epx-results_simpleflu'}
 locations = ['Jefferson_County_PA']
 num_runs = 3
 num_cores = 1
-
-
-class cd:
-    """
-    Context manager for changing the current working directory
-    """
-
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
-
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
 
 
 def main():
