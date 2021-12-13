@@ -9,6 +9,11 @@ version: 2
 sphinx:
    configuration: docs/conf.py
 
+submodules:
+  include:
+    - docs/doc-shared
+  recursive: true
+
 # Build docs in PDF in addition to HTML
 formats:
    - pdf
