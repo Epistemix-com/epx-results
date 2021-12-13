@@ -1,11 +1,11 @@
 # epx-results
 
-epx-results is a Python package for interacting with FRED simulation results.
+epx-results is a Python package for interacting with FRED simulation results. The documentation for this projected is hosted by Read the Docs [here](https://epistemix-epx-results.readthedocs-hosted.com/en/latest/index.html), including installation instructions, a quickstart guide, and a complete API reference.
 
 
 ## Requirements
 
-In order to use the functions in this package, you will need the following python packages installed:
+In order to use the functions in this package, you will need the following Python packages installed:
 
 - [Pandas](https://pandas.pydata.org)
 
