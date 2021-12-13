@@ -9,13 +9,10 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
-import pathlib
-sharedconf_path = os.path.abspath(os.path.join(pathlib.Path(__file__).parent.resolve(), 'doc-shared/code'))
-sys.path.insert(0, sharedconf_path)
+sys.path.insert(0, os.path.abspath('doc-shared/code'))
+sys.path.insert(0, os.path.abspath('../epxresults'))
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
-print(sharedconf_path)
-print(os.getcwd())
 
 # -- Shared settings -----------------------------------------------------
 
