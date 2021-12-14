@@ -16,7 +16,11 @@ else:
     from pip._internal import main as pip_main
 
 PACKAGENAME = "epx-results"
-VERSION = "0.0"
+
+VERSION = ""
+mypackage_root_dir = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(mypackage_root_dir, 'VERSION')) as version_file:
+    VERSION = version_file.read().strip()
 
 setup(
     name=PACKAGENAME,
