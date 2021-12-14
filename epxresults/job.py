@@ -84,7 +84,7 @@ class FREDJob(object):
     >>> from epxresults import FREDJob
     >>> job = FREDJob(job_key='simpleflu')
 
-    will provide an object, ``job``, that provides access to the
+    will return an object, ``job``, that provides access to the
     results associated with ``'simpleflu'``.
     """
 

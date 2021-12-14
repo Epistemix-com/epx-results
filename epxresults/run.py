@@ -24,7 +24,7 @@ class FREDRun(object):
 
     **kwargs: dict
         One of the following keyword parameters must be provided when
-        intializing a FREDjob object:
+        intializing a FREDrun object:
 
         job_key : string
             A FRED job key.
