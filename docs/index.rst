@@ -16,7 +16,12 @@ The core functionality of the package includes:
 Getting Started
 ===============
 
-Coming soon!
+.. toctree::
+   :maxdepth: 1
+
+   install
+   quickstart_and_tutorials/index
+
 
 Indices and tables
 ==================

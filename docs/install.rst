@@ -10,7 +10,8 @@ Either way, be sure to read the :ref:`epxresults_dependencies` section prior to 
 Using pip
 ====================
 
-<provide instructions for installing with pip>
+This package is not yet availabe on PyPI. Please check back in the future for instructions on how to install
+epx-results using pip. Currently, the only way to install epx-results is :ref:`from source <install_from_source>`.
 
 .. _install_from_source:
 
@@ -18,7 +19,7 @@ Building from source
 ====================
 
 If you don't install the latest release using pip,
-you can instead clone the cource code and call the setup file.
+you can instead clone the source code and call the setup file.
 This is the most common way to install epx-results if you want versions of the
 code that have been updated since the latest official release. In this case,
 after installation it is particularly important that you follow the instructions
@@ -33,6 +34,7 @@ The first step is to clone the epx-results repository::
 	git clone git@github.com:Epistemix-com/epx-results.git
 	cd epx-results
 
+
 Installing one of the official releases
 ------------------------------------------
 
@@ -40,9 +42,10 @@ All official releases of the code are tagged with their version name, e.g., v1.0
 To install a particular release::
 
 	git checkout v1.0
-	python setup.py install
+	pip install .
 
 This will install the v1.0 release of the code. Other official release versions (e.g., v1.1) can be installed similarly.
+
 
 Installing the most recent main branch
 ------------------------------------------
@@ -50,9 +53,37 @@ Installing the most recent main branch
 If you prefer to use the most recent version of the code::
 
 	git checkout main
-	python setup.py install
+	pip install .
 
 This will install the main branch of the code that is currently under development. While the features in the official releases have a stable API, new features being developed in the main branch may not. However, the main branch may have new features and/or performance enhancements that you may wish to use for your science application. A concerted effort is made to ensure that only thoroughly tested and documented code appears in the public main branch, though epx-results users should be aware of the distinction between the bleeding edge version in main and the official release version available through pip.
+
+
+.. _installing_epxresults_with_virtualenv:
+
+Installing epx-results using a virtual environment
+----------------------------------------------------
+If you use `conda <https://docs.conda.io/en/latest/>`_ to manage your Python distribution and package dependencies, it is easy to create a virtual environment that will automatically have compatible versions of the necessary dependencies required by epx-results. By installing into a virtual environment, you will not change any of the packages that are already installed system-wide on your machine. In the example below, we will use conda to create a virtual environment with all the dependencies handled automatically::
+
+
+	conda create -n epx python=3.8 pandas
+
+
+In order to activate this environment::
+
+
+	source activate epx
+
+
+Then install epx-results into this environment::
+
+	pip install epxresults
+
+
+Or, alternatively, you can install the latest main branch by following the :ref:`install from source <install_from_source>` instructions.
+
+Any additional packages you install into the epx virtual environment will not impact your system-wide environment. Whenever you want work with epx-results, just activate the environment and import the code. When you are done and wish to return to your normal system environment::
+
+	source deactivate
 
 
 .. _epxresults_dependencies:
@@ -60,9 +91,10 @@ This will install the main branch of the code that is currently under developmen
 Dependencies
 ============
 
-If you install epx-results using pip, then most of your dependencies will be handled for you automatically. 
+If you install epx-results using pip, then most of your dependencies will be handled for you automatically.
 
-<add list of explicit dependencies here>
+- `Pandas <https://pandas.pydata.org>`_
+
 
 .. _verifying_your_installation:
 
@@ -92,13 +124,15 @@ Once you have installed the package, see :ref:`getting_started` for instructions
 Testing your installation
 =========================
 
-<provide instructions on running a testing suite>
+To verify that your epx-results installation runs properly, navigate to some new working directory and execute the test suite. If you installed epx-results into a virtual environment, activate the environment before spawning a python session and executing the code below.
+
+The full testing suite can be run by executing:
+
+.. code:: python
+
+	import epxresults
+	epxresults.test()  #  v0.5 and earlier
 
 
-Troubleshooting
-==================
-
-<provide any troubleshooting hints here>
-
-
+Whether you installed the master branch or a release branch, the message that concludes the execution of the test suite should not indicate that there were any errors or failures. If you encounter problems when running the test suite, please be sure you have installed the package dependencies first before raising a Github Issue and/or contacting the epx-results developers.
 
