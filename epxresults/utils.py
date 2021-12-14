@@ -344,8 +344,7 @@ def _path_to_job(**kwargs) -> Path:
     Parameters
     ----------
     **kwargs : dict
-        One of the following keyword parameters must be provided when
-        intializing a FREDjob object:
+        One of the following keyword parameters must be provided:
 
         job_key : string
             A FRED job key name.
