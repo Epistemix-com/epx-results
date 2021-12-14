@@ -28,7 +28,7 @@ PKG_TESTS_DIRECTORY = Path(os.path.join(PKG_DIRECTORY, 'tests'))
 PKG_FRED_RESULTS = os.path.join(f'{PKG_TESTS_DIRECTORY}', 'fred-results')
 
 # FRED model tests
-test_models = {'simpleflu': 'epx-results_simpleflu'}
+test_models = {'simpleflu': 'simpleflu'}
 locations = ['Jefferson_County_PA']
 num_runs = 3
 num_cores = 1

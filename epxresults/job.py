@@ -79,13 +79,13 @@ class FREDJob(object):
     Examples
     --------
     A ``FREDJob`` object may be instantiated using a FRED Job key. For example,
-    if there is a FRED job with a key ``'example_job'``, then,
+    if there is a FRED job with a key ``'simpleflu'``, then,
 
     >>> from epxresults import FREDJob
-    >>> example_results = FREDJob(job_key='example_job')
+    >>> job = FREDJob(job_key='simpleflu')
 
-    will provide an object, ``example_results``, that provides access to the
-    results associated with ``'example_job'``.
+    will provide an object, ``job``, that provides access to the
+    results associated with ``'simpleflu'``.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -197,6 +197,7 @@ class FREDJob(object):
                 try:
                     condition, state = line.split('.')
                     if condition == 'FRED':
+                        variable = state
                         global_variables.add(variable)
                     else:
                         conditions.add(condition)
@@ -209,7 +210,7 @@ class FREDJob(object):
             self,
             condition: str,
             state: str,
-            count_type: str = 'count',
+            count_type: str = 'cumulative',
             interval: str = 'daily'
             ) -> pd.DataFrame:
         """
@@ -245,6 +246,20 @@ class FREDJob(object):
         -----
         Only conditions with the property ``output=1`` will be available
         with this method.
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, the ``INF`` condition represents a
+        contagious influenza. The cumulative number of agents exposed to this
+        condition in each run on each day of the simulation can be loaded as:
+
+        >>> from epxresults import FREDJob
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> job.get_job_state_table(condition='INF', state='E')
+           RUN1  RUN2  RUN3
+        0 ...
+        1 ...
+        ...
         """
 
         prefix = _count_types[count_type]
@@ -293,6 +308,24 @@ class FREDJob(object):
         -----
         Only global variables with output turned on, ``<variable>.output=1``,
         will be available with this method.
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, there are a set of global variables,
+        ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
+        number of agents who are susecptible to the ``INF`` condition,
+        infected, and recoered.
+
+        The daily number of infected agents in each run on each day of the
+        simualtion can be loaded as:
+
+        >>> from epxresults import FREDJob
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> job.get_job_variable_table(variable='Infected')
+           RUN1  RUN2  RUN3
+        0   ...
+        1   ...
+        ...
         """
 
         # check if variable is available

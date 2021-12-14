@@ -41,6 +41,8 @@ def load_local_job_keys(**kwargs) -> Dict[str, int]:
 
     >>> from epxresults import load_local_job_keys
     >>> job_keys = load_local_job_keys()
+    >>> print(job_keys)
+    {...}
 
     See the `Notes` section for details on how a local FRED results
     directory is specified.
@@ -80,13 +82,8 @@ def return_job_id(job_key, **kwargs) -> int:
 
     Parameters
     ----------
-    **kwargs : dict
-        One of the following keyword parameters must be provided:
-
-        job_key : string
-            A valid FRED job key
-        PATH_TO_JOB : PathLike, optional
-            the path to a FRED job directory
+    job_key : string
+        A valid FRED job key
 
     Other Parameters
     ----------------
@@ -116,7 +113,9 @@ def return_job_id(job_key, **kwargs) -> int:
     For example,
 
     >>> from epxresults import return_job_id
-    >>> job_id = return_job_id('example_job')
+    >>> job_id = return_job_id('simpleflu')
+    >>> print(f"The job ID assocaited with `simpleflu` is {job_id}")
+    The job ID assocaited with `simpleflu` is ...
 
     See the `Notes` section for details on how a local FRED results
     directory is specified.
@@ -173,11 +172,12 @@ def return_job_run_ids(**kwargs) -> List[int]:
     Examples
     --------
     If a FRED results directory is specified by environmental variables,
-    a list of FRED run IDs associated with a FRED jobkeys can be loaded
+    a list of FRED run IDs associated with a FRED job key can be loaded
     easily. For example,
 
     >>> from epxresults import return_job_run_ids
-    >>> run_ids = return_job_run_ids(job_key = 'example_job')
+    >>> return_job_run_ids(job_key = 'simpleflu')
+    [1, 2, 3]
 
     See the `Notes` section for details on how the the path to a local
     FRED job directory is resolved.
@@ -249,10 +249,10 @@ def _path_to_results(**kwargs) -> Path:
     >>> FRED_RESULTS = os.getenv('FRED_RESULTS')
     >>> FRED_HOME = os.getenv('FRED_HOME')
     >>>
-    >>> print("FRED_RESULTS={FRED_RESULTS}")
-        'FRED_RESULTS=path/to/fred-results'
-    >>> print("FRED_HOME={FRED_HOME}")
-        'FRED_HOME=path/to/fred-home'
+    >>> print(f"FRED_RESULTS={FRED_RESULTS}")
+    FRED_RESULTS=...
+    >>> print(f"FRED_HOME={FRED_HOME}")
+    FRED_HOME=...
 
     :meta public:
     """

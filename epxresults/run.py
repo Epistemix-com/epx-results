@@ -54,7 +54,7 @@ class FREDRun(object):
     sim_days : List[int]
         a list of simulation days, starting at 0.
     sim_dates : List[int]
-        a list of simulaton dat stamps in the format YYYYMMDD
+        a list of simulaton date stamps in the format YYYYMMDD
 
     Methods
     -------
@@ -174,6 +174,33 @@ class FREDRun(object):
 
     def get_csv_output(self, filename):
         """
+        Load CSV output from a FRED run.
+
+        Parameters
+        ----------
+        filename : str
+            a csv filename
+
+        Returns
+        -------
+        csv_table : pandas.DataFrame
+            a pandas DataFrame containing the contents of `filename`.
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, infection events are recorded in
+        ``infections.csv``, which for each infection, records the infcted
+        agent's ID, the date of exposure, the agent's age, and the agent's sex.
+
+        The table of infection events can be loaded for run 1:
+
+        >>> from epxresults import FREDJob
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> run = job.runs[1]
+        >>> run.get_csv_output('infections.csv')
+                   id      date  age  sex
+        0   ...
+        ...
         """
         path_to_csv = os.path.join(self.path_to_run, 'CSV', filename)
         return _read_fred_csv(path_to_csv)
