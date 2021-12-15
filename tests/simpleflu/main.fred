@@ -6,8 +6,10 @@
 simulation {
     locations = Jefferson_County_PA
     start_date = 2020-Jan-01
-    end_date = 2020-Jan-05
+    end_date = 2020-Jan-30
     weekly_data = 1
+    snapshots = 1
+    #snapshot_interval = 7
 }
 
 include simpleflu.fred

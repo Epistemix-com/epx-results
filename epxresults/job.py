@@ -3,11 +3,13 @@
 
 import os
 import re
+import datetime as dt
 from typing import (Dict, List, Optional, Tuple, Union)
 import pandas as pd
 from .utils import (_path_to_job, _path_to_results,
                     return_job_id, return_job_run_ids)
 from .run import FREDRun
+from .snapshot import Snapshot
 
 __all__ = ['FREDJob']
 __author__ = ['Duncan Campbell']
@@ -342,3 +344,55 @@ class FREDJob(object):
 
         pattern = re.compile("RUN[0-9]+")
         return pd.read_csv(path, usecols=lambda x: pattern.match(x))
+
+    @property
+    def snapshots(self) -> Dict[dt.date, Snapshot]:
+        """
+        a dictionary of snapshots associated with this job
+        """
+
+        self._snapshots = {}
+        for snapshot_file in self._parse_snapshots():
+            snapshot = Snapshot(PATH_TO_SNAPSHOT=os.path.join(self.path_to_job,
+                                                              snapshot_file))
+            if snapshot.date is not None:
+                self._snapshots[snapshot.date] = snapshot
+            else:
+                pass
+        return self._snapshots
+
+    def _parse_snapshots(self) -> List[str]:
+        """
+        collect snapshot filenames in the FRED job.
+        """
+
+        snapshots = [f for f in os.listdir(os.path.join(self.path_to_job, 'OUT'))
+                     if re.match(r'snapshot.*\.tgz$', f)]
+        return snapshots
+
+    def get_snapshot(self, date):
+        """
+        Return a snapshot for a given simulation date.
+
+        Parameters
+        ----------
+        date : dt.date
+            a datetime date object
+
+        Returns
+        -------
+        snapshot : Snapshot
+            a FRED snapshot object
+
+        Rasies
+        ------
+        KeyError
+            Raised if there is not snapshot for `date` in this FRED job.
+        """
+
+        try:
+            return self.snapshots[date]
+        except KeyError:
+            msg = (f"There is no snapshot available for simulation "
+                   f"date:{date}.")
+            raise KeyError(msg)
