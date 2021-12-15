@@ -3,6 +3,7 @@
 
 import os
 import re
+import numpy as np
 import datetime as dt
 from typing import (Dict, List, Optional, Tuple, Union)
 from .utils import (_path_to_run, _value_str_to_value, _read_fred_csv)
@@ -11,6 +12,14 @@ from .run_logs import _read_fred_run_log
 
 __all__ = ['FREDRun']
 __author__ = ['Duncan Campbell']
+
+
+_interval_dirs = {'daily': 'DAILY',
+                  'Weekly': 'WEEKLY'}
+# prefix associated with different state counts
+_count_types = {'count': '',
+                'new': 'new',
+                'cumulative': 'tot'}
 
 
 class FREDRun(object):
@@ -171,6 +180,184 @@ class FREDRun(object):
                 p = progress_pattern.findall(line)[0]
                 progress.append(float(p.strip('%')))
         return progress[-1]
+
+    def get_state(
+            self,
+            condition: str,
+            state: str,
+            count_type: str = 'cumulative',
+            interval: str = 'daily'
+            ) -> np.array:
+        """
+        Return an array of state counts in `condition`.
+
+        Parameters
+        ----------
+        condition : str
+            a FRED condition name
+
+        state : str
+            a state name in `condition`
+
+        count_type : str, optional
+            the type of count returned, one of 'count', 'new', or 'cumulative'.
+            'count' returns the number of agents in a state at midnight
+            on the simulation day. 'new' returns the number of times any agent
+            entered that state on the simulation day. 'cumulative' returns
+            the cumulative number of times any agent has entered the state
+            by the simulation day.
+
+        interval : str
+            the output interval
+
+        Returns
+        -------
+        arr : numpy.array
+            an array of integers containing `state` counts
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, the ``INF`` condition represents a
+        contagious influenza. The cumulative number of agents exposed to this
+        condition on each day of the simulation can be loaded as:
+
+        >>> from epxresults import FREDRun
+        >>> run = FREDRun(job_key='simpleflu', run_id=1)
+        >>> arr = run.get_state(condition='INF', state='E')
+        """
+
+        prefix = _count_types[count_type]
+        fname = f"{condition}.{prefix}{state}.txt"
+        fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
+
+        if not os.path.isfile(fname):
+            msg = (f'No output found for {condition}.{prefix}{state} in '
+                   f'{os.path.join(self.path_to_run, _interval_dirs[interval])}.')
+            raise FileNotFoundError(msg)
+
+        # read in data from file
+        arr = []
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+            count = 0
+            for line in lines:
+                sim_time_unit, value = line.split(' ')
+                arr.append(value)
+                count += 1
+        return np.array(arr).astype(int)
+
+    def get_variable(
+            self,
+            variable: str,
+            interval: str = 'daily'
+            ) -> np.array:
+        """
+        Return an array of values for a global varibale.
+
+        Parameters
+        ----------
+        variable : str
+            FRED global variable name
+
+        interval : str
+            the output interval
+
+        Returns
+        -------
+        arr : numpy.array
+            an array floats containing `variable` values
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, there are a set of global variables,
+        ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
+        number of agents who are susecptible to the ``INF`` condition,
+        infected, and recovered.
+
+        The daily number of infected agents in run on each day of the
+        simulation can be loaded as:
+
+        >>> from epxresults import FREDRun
+        >>> run = FREDRun(job_key='simpleflu', run_id=1)
+        >>> arr = run.get_variable(variable='Infected')
+        """
+
+        fname = f"FRED.{variable}.txt"
+        fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
+
+        if not os.path.isfile(fname):
+            msg = (f'No output found for {variable} in '
+                   f'{os.path.join(self.path_to_run, _interval_dirs[interval])}')
+            raise FileNotFoundError(msg)
+
+        # read in data from file
+        arr = []
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+            count = 0
+            for line in lines:
+                sim_time_unit, value = line.split(' ')
+                arr.append(value)
+                count += 1
+        return np.array(arr).astype(float)
+
+    def get_list_variable(
+            self,
+            variable: str,
+            sim_day: int = None,
+            ) -> np.ndarray:
+        """
+        Return an array of values for a global list varibale.
+
+        Parameters
+        ----------
+        variable : str
+            FRED global list variable name
+
+        sim_day : int
+            the simulation day,
+            by default, the last output will be returned.
+
+        Returns
+        -------
+        arr : numpy.array
+            an array floats containing `variable` values
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, there are a set of global list variables,
+        ``g_list_of_case_count_by_age`` and ``g_list_of_symp_count_by_age``
+        that count the number agents who are infected and symptomatic in age
+        bins.
+
+        The number of cases in age bins can then be loaded as
+
+        >>> from epxresults import FREDRun
+        >>> run = FREDRun(job_key='simpleflu', run_id=1)
+        >>> arr = run.get_list_variable(variable='g_list_of_case_count_by_age')
+        """
+
+        if sim_day is not None:
+            fname = f"{variable}-{sim_day}.txt"
+        else:
+            fname = f"{variable}.txt"
+        fname = os.path.join(self.path_to_run, 'LIST', fname)
+
+        if not os.path.isfile(fname):
+            msg = (f"The requested output for `{variable}` was not found in "
+                   f"{os.path.join(self.path_to_run, 'LIST')}")
+            raise FileNotFoundError(msg)
+
+        # read in data from file
+        arr = []
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+            count = 0
+            for line in lines[1:]:
+                value = line.strip()
+                arr.append(value)
+                count += 1
+        return np.array(arr).astype(float)
 
     def get_csv_output(self, filename):
         """
