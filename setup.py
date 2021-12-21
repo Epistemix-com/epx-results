@@ -17,10 +17,16 @@ else:
 
 PACKAGENAME = "epx-results"
 
-VERSION = ""
-mypackage_root_dir = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(mypackage_root_dir, 'VERSION')) as version_file:
-    VERSION = version_file.read().strip()
+
+def read(file_name):
+    """Read a text file and return the content as a string."""
+    with io.open(
+        os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8"
+    ) as f:
+        return f.read()
+
+
+VERSION = read("epxresults/VERSION")
 
 setup(
     name=PACKAGENAME,
@@ -31,9 +37,9 @@ setup(
     description="Python tools for FRED simulation results manipulation",
     long_description=("A package which contains python tools for interacting "
                       "with local FRED simulation results"),
-    install_requires=['pandas'],
+    install_requires=['pandas', 'pytest'],
     packages=find_packages(),
     url="https://github.com/Epistemix-com/epx-results",
-    package_data={},
+    package_data={'epxresults': ['VERSION']},
     cmdclass={},
 )
