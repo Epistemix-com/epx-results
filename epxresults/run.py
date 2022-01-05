@@ -24,12 +24,12 @@ class FREDRun(object):
 
     **kwargs: dict
         One of the following keyword parameters must be provided when
-        intializing a FREDrun object:
+        intializing a `FREDrun` object:
 
         job_key : string
-            A FRED job key.
+            a FRED job key.
         job_id : int
-            A FRED job ID.
+            a FRED job ID.
         PATH_TO_JOB : PathLike
             a path to a FRED job.
         PATH_TO_RUN : PathLike
@@ -50,11 +50,13 @@ class FREDRun(object):
     parameters
     progress
     path_to_run : Path
+        a full path to a FRED run directory
     run_id : int
+        a FRED run ID
     sim_days : List[int]
-        a list of simulation days, starting at 0.
+        a list of simulation days, starting at 0
     sim_dates : List[int]
-        a list of simulaton date stamps in the format YYYYMMDD
+        a list of simulation date stamps in the format YYYYMMDD
 
     Methods
     -------
