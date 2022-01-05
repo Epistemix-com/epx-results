@@ -67,7 +67,7 @@ def merge_fred_results(
         if verbose:
             print(f"Inserting {job_key} into {FRED_RESULTS} ...")
         path_to_job = os.path.join(source, f'JOB/{source_keys[job_key]}')
-        insert_fred_job(path_to_job, job_key, force=force,
+        insert_fred_job(path_to_job, job_key=job_key, force=force,
                         verbose=verbose, **kwargs)
 
     if verbose:
@@ -76,6 +76,7 @@ def merge_fred_results(
 
 def insert_fred_job(
         PATH_TO_JOB: PathLike,
+        destination: PathLike = None,
         job_key: str = None,
         force: bool = False,
         verbose: bool = False,
