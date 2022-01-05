@@ -11,6 +11,7 @@ from .utils import *
 from .job import *
 from .run import *
 from .insert import *
+from .snapshot import *
 
 
 # version

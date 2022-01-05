@@ -3,11 +3,13 @@
 
 import os
 import re
+import datetime as dt
 from typing import (Dict, List, Optional, Tuple, Union)
 import pandas as pd
 from .utils import (_path_to_job, _path_to_results,
                     return_job_id, return_job_run_ids)
 from .run import FREDRun
+from .snapshot import Snapshot
 
 __all__ = ['FREDJob']
 __author__ = ['Duncan Campbell']
@@ -33,9 +35,9 @@ class FREDJob(object):
         intializing a FREDjob object:
 
         job_key : string
-            A FRED job key.
+            a FRED job key
         job_id : int
-            A FRED job ID.
+            a FRED job ID
         PATH_TO_JOB : PathLike
             a path to a FRED job.
 
@@ -97,6 +99,7 @@ class FREDJob(object):
         self.job_key = self._return_job_key()
         self.job_id = self._return_job_id(**kwargs)
         self.conditions, self.global_variables = self._parse_vars()
+        self._snapshot_map = self._set_snapshot_map()
 
     @property
     def status(self) -> str:
@@ -150,12 +153,12 @@ class FREDJob(object):
         Parameters
         ----------
         PATH_TO_JOB : PathLike
-            a path to a FRED job.
+            a path to a FRED job
 
         Returns
         -------
         job_id : int
-            A FRED job ID.
+            a FRED job ID
 
         Notes
         -----
@@ -181,7 +184,7 @@ class FREDJob(object):
         Returns
         -------
         conditions : List
-            a list of FRED conditon names
+            a list of FRED condition names
 
         global_variables : List
             a list of global variable names
@@ -255,11 +258,7 @@ class FREDJob(object):
 
         >>> from epxresults import FREDJob
         >>> job = FREDJob(job_key='simpleflu')
-        >>> job.get_job_state_table(condition='INF', state='E')
-           RUN1  RUN2  RUN3
-        0 ...
-        1 ...
-        ...
+        >>> df = job.get_job_state_table(condition='INF', state='E')
         """
 
         prefix = _count_types[count_type]
@@ -293,7 +292,7 @@ class FREDJob(object):
         Parameters
         ----------
         variable : str
-            FRED global variable name
+            a FRED global variable name
 
         interval : str
             the output inteval
@@ -314,18 +313,14 @@ class FREDJob(object):
         In the ``'simpleflu'`` model, there are a set of global variables,
         ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
         number of agents who are susecptible to the ``INF`` condition,
-        infected, and recoered.
+        infected, and recovered.
 
         The daily number of infected agents in each run on each day of the
-        simualtion can be loaded as:
+        simulation can be loaded as:
 
         >>> from epxresults import FREDJob
         >>> job = FREDJob(job_key='simpleflu')
-        >>> job.get_job_variable_table(variable='Infected')
-           RUN1  RUN2  RUN3
-        0   ...
-        1   ...
-        ...
+        >>> df = job.get_job_variable_table(variable='Infected')
         """
 
         # check if variable is available
@@ -342,3 +337,75 @@ class FREDJob(object):
 
         pattern = re.compile("RUN[0-9]+")
         return pd.read_csv(path, usecols=lambda x: pattern.match(x))
+
+    def _parse_snapshots(self) -> List[str]:
+        """
+        collect snapshot filenames in the FRED job.
+        """
+
+        snapshots = [f for f in os.listdir(os.path.join(self.path_to_job, 'OUT'))
+                     if re.match(r'snapshot.*\.tgz$', f)]
+        return snapshots
+
+    def _set_snapshot_map(self) -> Dict[dt.date, Snapshot]:
+        """
+        build a dictionary which maps dates to snapshots
+        """
+        self._snapshot_map = {}
+        for snapshot_file in self._parse_snapshots():
+            snapshot = Snapshot(PATH_TO_SNAPSHOT=os.path.join(self.path_to_job,
+                                                              snapshot_file))
+            if snapshot.date is not None:
+                self._snapshot_map[snapshot.date] = snapshot
+            else:
+                pass
+        return self._snapshot_map
+
+    @property
+    def snapshots(self) -> List[Snapshot]:
+        """
+        a list of snapshots associated with this job
+        """
+
+        self._snapshots = {}
+        self._snapshot_map = self._set_snapshot_map()
+        return list(self._snapshot_map.values())
+
+    def get_snapshot(self, date) -> Snapshot:
+        """
+        Return a snapshot for a given simulation date.
+
+        Parameters
+        ----------
+        date : dt.date
+            a datetime date object
+
+        Returns
+        -------
+        snapshot : Snapshot
+            a FRED snapshot object
+
+        Rasies
+        ------
+        KeyError
+            raised if there is not snapshot for `date` in this FRED job
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, a snapshot is generated on simulation
+        date January 31, 2020. This snapshot can be retreived by:
+
+        >>> import datetime as dt
+        >>> from epxresults import FREDJob
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> snap = job.get_snapshot(date=dt.date(2020, 1, 31))
+        """
+
+        self._snapshot_map = self._set_snapshot_map()
+
+        try:
+            return self._snapshot_map[date]
+        except KeyError:
+            msg = (f"There is no snapshot available for simulation "
+                   f"date: {date}.")
+            raise KeyError(msg)
