@@ -4,6 +4,7 @@
 import os
 import re
 import numpy as np
+import pandas as pd
 import datetime as dt
 from typing import (Dict, List, Optional, Tuple, Union)
 from .utils import (_path_to_run, _value_str_to_value, _read_fred_csv)
@@ -36,13 +37,13 @@ class FREDRun(object):
         intializing a `FREDrun` object:
 
         job_key : string
-            a FRED job key.
+            a FRED job key
         job_id : int
-            a FRED job ID.
+            a FRED job ID
         PATH_TO_JOB : PathLike
-            a path to a FRED job.
+            a path to a FRED job
         PATH_TO_RUN : PathLike
-            a path to a FRED run.
+            a path to a FRED run
 
     Other Parameters
     ----------------
@@ -52,7 +53,7 @@ class FREDRun(object):
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
         FRED_HOME : PathLike
-            the full path to a local FRED home directory.
+            the full path to a local FRED home directory
 
     Attributes
     ----------
@@ -148,7 +149,7 @@ class FREDRun(object):
 
     def get_log(self) -> List[str]:
         """
-        Return a FRED run log
+        Return a FRED run log.
 
         Returns
         -------
@@ -168,7 +169,7 @@ class FREDRun(object):
 
     def _load_progress(self) -> float:
         """
-        Load progress from `progress.txt`
+        Load progress from `progress.txt`.
         """
 
         fname = os.path.join(self.path_to_run, 'progress.txt')
@@ -189,9 +190,9 @@ class FREDRun(object):
             state: str,
             count_type: str = 'cumulative',
             interval: str = 'daily'
-            ) -> np.array:
+            ) -> pd.Series:
         """
-        Return an array of state counts in `condition`.
+        Return an series of state counts in `condition`.
 
         Parameters
         ----------
@@ -214,8 +215,8 @@ class FREDRun(object):
 
         Returns
         -------
-        arr : numpy.array
-            an array of integers containing `state` counts
+        ser : pd.Series
+            a series of integers containing `state` counts
 
         Examples
         --------
@@ -225,10 +226,21 @@ class FREDRun(object):
 
         >>> from epxresults import FREDRun
         >>> run = FREDRun(job_key='simpleflu', run_id=1)
-        >>> arr = run.get_state(condition='INF', state='E')
+        >>> ser = run.get_state(condition='INF', state='E')
         """
 
+        # check `count_type` keyword argument
+        if count_type not in _count_types.keys():
+            msg = (f"`count_type` must be one of {_count_types.keys()}")
+            raise ValueError(msg)
+
+        # check `interval` keyword argument
+        if interval not in _interval_dirs.keys():
+            msg = (f"`interval` must be one of {_interval_dirs.keys()}")
+            raise ValueError(msg)
+
         prefix = _count_types[count_type]
+
         fname = f"{condition}.{prefix}{state}.txt"
         fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
 
@@ -244,30 +256,30 @@ class FREDRun(object):
             count = 0
             for line in lines:
                 sim_time_unit, value = line.split(' ')
-                arr.append(value)
+                arr.append(_value_str_to_value(value))
                 count += 1
-        return np.array(arr).astype(int)
+        return pd.Series(arr, dtype='int')
 
     def get_variable(
             self,
             variable: str,
             interval: str = 'daily'
-            ) -> np.array:
+            ) -> pd.Series:
         """
         Return an array of values for a global varibale.
 
         Parameters
         ----------
         variable : str
-            FRED global variable name
+            a FRED global variable name
 
         interval : str
             the output interval
 
         Returns
         -------
-        arr : numpy.array
-            an array floats containing `variable` values
+        ser : pd.Series
+            a series of floats containing `variable` values
 
         Examples
         --------
@@ -281,8 +293,13 @@ class FREDRun(object):
 
         >>> from epxresults import FREDRun
         >>> run = FREDRun(job_key='simpleflu', run_id=1)
-        >>> arr = run.get_variable(variable='Infected')
+        >>> ser = run.get_variable(variable='Infected')
         """
+
+        # check `interval` keyword argument
+        if interval not in _interval_dirs.keys():
+            msg = (f"`interval` must be one of {_interval_dirs.keys()}")
+            raise ValueError(msg)
 
         fname = f"FRED.{variable}.txt"
         fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
@@ -299,31 +316,30 @@ class FREDRun(object):
             count = 0
             for line in lines:
                 sim_time_unit, value = line.split(' ')
-                arr.append(value)
+                arr.append(_value_str_to_value(value))
                 count += 1
-        return np.array(arr).astype(float)
+        return pd.Series(arr, dtype='float')
 
     def get_list_variable(
             self,
             variable: str,
             sim_day: int = None,
-            ) -> np.ndarray:
+            ) -> pd.Series:
         """
         Return an array of values for a global list varibale.
 
         Parameters
         ----------
         variable : str
-            FRED global list variable name
+            a FRED global list variable name
 
         sim_day : int
-            the simulation day,
-            by default, the last output will be returned.
+            the simulation day. By default, the last output will be returned.
 
         Returns
         -------
-        arr : numpy.array
-            an array floats containing `variable` values
+        arr : pd.Series
+            a series of floats containing `variable` values
 
         Examples
         --------
@@ -336,7 +352,7 @@ class FREDRun(object):
 
         >>> from epxresults import FREDRun
         >>> run = FREDRun(job_key='simpleflu', run_id=1)
-        >>> arr = run.get_list_variable(variable='g_list_of_case_count_by_age')
+        >>> ser = run.get_list_variable(variable='g_list_of_case_count_by_age')
         """
 
         if sim_day is not None:
@@ -359,7 +375,7 @@ class FREDRun(object):
                 value = line.strip()
                 arr.append(value)
                 count += 1
-        return np.array(arr).astype(float)
+        return pd.Series(arr, dtype='float')
 
     def get_csv_output(self, filename):
         """
@@ -386,10 +402,7 @@ class FREDRun(object):
         >>> from epxresults import FREDJob
         >>> job = FREDJob(job_key='simpleflu')
         >>> run = job.runs[1]
-        >>> run.get_csv_output('infections.csv')
-                   id      date  age  sex
-        0   ...
-        ...
+        >>> df = run.get_csv_output('infections.csv')
         """
         path_to_csv = os.path.join(self.path_to_run, 'CSV', filename)
         return _read_fred_csv(path_to_csv)
