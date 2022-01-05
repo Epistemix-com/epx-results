@@ -7,7 +7,7 @@ import pytest
 import os
 import numpy as np
 
-from epistemixpy.results.run import (
+from epxresults.run import (
     FREDRun
     )
 from epxresults.utils import (

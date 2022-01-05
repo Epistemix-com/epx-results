@@ -103,8 +103,8 @@ def return_job_id(job_key, **kwargs) -> int:
     Raises
     ------
     KeyError
-        Raised if a FRED job associated with `job_key` cannot be found
-        in the indicated local FRED results directory.
+        raised if a FRED job associated with `job_key` cannot be found
+        in the indicated local FRED results directory
 
     Examples
     --------
@@ -148,9 +148,9 @@ def return_job_run_ids(**kwargs) -> List[int]:
         One of the following keyword parameters must be provided:
 
         job_id : int, optional
-            an integer FRED job ID
+            a FRED job ID
         job_key : string, optional
-            a sFRED job key
+            a FRED job key
         PATH_TO_JOB : PathLike, optional
             the path to a FRED job directory
 
@@ -226,10 +226,10 @@ def _path_to_results(**kwargs) -> Path:
     Raises
     ------
     FileNotFoundError
-        Raised if the indicated FRED results directory cannot be found.
+        raised if the indicated FRED results directory cannot be found
     ValueError
-        Raised if the keyword parameters are not sufficient to uniquely
-        identify a FRED results directory.
+        raised if the keyword parameters are not sufficient to uniquely
+        identify a FRED results directory
 
     Notes
     -----
@@ -297,9 +297,9 @@ def _inferred_path_to_results() -> None:
     Raises
     ------
     RuntimeError
-        Raised if no local FRED results directory can be inferred.
+        raised if no local FRED results directory can be inferred
     FileNotFoundError
-        Raised if the inferred local FRED results directory can not be found.
+        raised if the inferred local FRED results directory can not be found
 
     Notes
     -----
@@ -347,9 +347,9 @@ def _path_to_job(**kwargs) -> Path:
         One of the following keyword parameters must be provided:
 
         job_key : string
-            A FRED job key name.
+            a FRED job key name
         job_id : int
-            A FRED job ID.
+            a FRED job ID
         PATH_TO_JOB : PathLike
             a path to a FRED job. If passed as an argument, this path is
             returned.
@@ -362,7 +362,7 @@ def _path_to_job(**kwargs) -> Path:
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
         FRED_HOME : PathLike
-            the full path to a local FRED home directory.
+            the full path to a local FRED home directory
 
     Returns
     -------
@@ -372,10 +372,10 @@ def _path_to_job(**kwargs) -> Path:
     Raises
     ------
     FileNotFoundError
-        Raised if the indicated FRED job directory cannot be found.
+        raised if the indicated FRED job directory cannot be found
     ValueError
-        Raised if the keyword parameters are not sufficient to uniquely
-        identify a FRED job directory.
+        raised if the keyword parameters are not sufficient to uniquely
+        identify a FRED job directory
 
     Notes
     -----
@@ -443,7 +443,7 @@ def _path_to_run(run_id: int = 1, **kwargs) -> Path:
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
         FRED_HOME : PathLike
-            the full path to a local FRED home directory.
+            the full path to a local FRED home directory
 
     Returns
     -------
@@ -453,10 +453,10 @@ def _path_to_run(run_id: int = 1, **kwargs) -> Path:
     Raises
     ------
     FileNotFoundError
-        Raised if the indicated FRED run directory cannot be found.
+        raised if the indicated FRED run directory cannot be found
     ValueError
-        Raised if the keyword parameters are not sufficient to uniquely
-        identify a FRED run directory.
+        raised if the keyword parameters are not sufficient to uniquely
+        identify a FRED run directory
 
     Notes
     -----
