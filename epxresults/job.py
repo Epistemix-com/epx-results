@@ -214,7 +214,8 @@ class FREDJob(object):
             condition: str,
             state: str,
             count_type: str = 'cumulative',
-            interval: str = 'daily'
+            interval: str = 'daily',
+            format: str = 'long'
             ) -> pd.DataFrame:
         """
         Return a table of state counts in `condition` for each run in a job.
@@ -239,11 +240,15 @@ class FREDJob(object):
             the interval over which state counts are performed.
             one of 'daily' or 'weekly'.
 
+        format : str, optional
+            the default DataFrame format, either 'wide' or 'long'. By default,
+            long format DataFrames are returned.
+
         Returns
         -------
         state_table : pandas.DataFrame
-            a pandas DataFrame containing `state` counts
-            for each run in a FRED job.
+            a pandas DataFrame containing `state` counts for each run in a FRED
+            job
 
         Notes
         -----
@@ -261,6 +266,11 @@ class FREDJob(object):
         >>> df = job.get_job_state_table(condition='INF', state='E')
         """
 
+        # check `count_type` keyword argument
+        if count_type not in _count_types.keys():
+            msg = (f"`count_type` must be one of {_count_types.keys()}")
+            raise ValueError(msg)
+
         prefix = _count_types[count_type]
         fname = f"{condition}.{prefix}{state}.csv"
         path_to_file = os.path.join(self.path_to_job,
@@ -269,7 +279,7 @@ class FREDJob(object):
 
         # check if condition is available
         if condition not in self.conditions:
-            msg = (f"{condition} is not availabe to load. "
+            msg = (f"{condition} is not available to load. "
                    "See `self.conditions` for a list of available conditions.")
             raise ValueError(msg)
 
@@ -279,12 +289,27 @@ class FREDJob(object):
             raise ValueError(msg)
 
         pattern = re.compile("RUN[0-9]+")
-        return pd.read_csv(path_to_file, usecols=lambda x: pattern.match(x))
+        df = pd.read_csv(path_to_file, usecols=lambda x: pattern.match(x))
+        df.index.name = 'sim_day'
+
+        if format == 'long':
+            df['sim_day'] = df.index
+            df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
+            df = df.rename(columns={"RUN": count_type})
+        elif format == 'wide':
+            # do nothing
+            pass
+        else:
+            msg = (f"Requested DataFrame format, {format}, not recognized.")
+            raise ValueError(msg)
+
+        return df
 
     def get_job_variable_table(
             self,
             variable: str,
-            interval: str = 'daily'
+            interval: str = 'daily',
+            format: str = 'long'
             ) -> pd.DataFrame:
         """
         Return a table of `variable` values for each run in a job.
@@ -296,6 +321,10 @@ class FREDJob(object):
 
         interval : str
             the output inteval
+
+        format : str, optional
+            the default DataFrame format, either 'wide' or 'long'. By default,
+            long format DataFrames are returned.
 
         Returns
         -------
@@ -336,14 +365,29 @@ class FREDJob(object):
                             f"{fname}")
 
         pattern = re.compile("RUN[0-9]+")
-        return pd.read_csv(path, usecols=lambda x: pattern.match(x))
+        df = pd.read_csv(path, usecols=lambda x: pattern.match(x))
+        df.index.name = 'sim_day'
+
+        if format == 'long':
+            df['sim_day'] = df.index
+            df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
+            df = df.rename(columns={"RUN": variable})
+        elif format == 'wide':
+            # do nothing
+            pass
+        else:
+            msg = (f"Requested DataFrame format, {format}, not recognized.")
+            raise ValueError(msg)
+
+        return df
 
     def _parse_snapshots(self) -> List[str]:
         """
         collect snapshot filenames in the FRED job.
         """
 
-        snapshots = [f for f in os.listdir(os.path.join(self.path_to_job, 'OUT'))
+        snapshots = [f for f in
+                     os.listdir(os.path.join(self.path_to_job, 'OUT'))
                      if re.match(r'snapshot.*\.tgz$', f)]
         return snapshots
 
