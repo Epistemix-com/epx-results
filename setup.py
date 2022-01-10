@@ -4,6 +4,7 @@
 from pathlib import Path
 import pip
 from setuptools import setup, find_packages
+import os
 from setuptools.command.install import install
 from setuptools.command.develop import develop
 import sys
@@ -20,13 +21,13 @@ PACKAGENAME = "epx-results"
 
 def read(file_name):
     """Read a text file and return the content as a string."""
-    with io.open(
+    with open(
         os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8"
     ) as f:
         return f.read()
 
 
-VERSION = read("epxresults/VERSION")
+VERSION = read("epxresults/VERSION").strip()
 
 setup(
     name=PACKAGENAME,
