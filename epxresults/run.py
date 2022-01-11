@@ -407,5 +407,5 @@ class FREDRun(object):
         path_to_csv = os.path.join(self.path_to_run, 'CSV', filename)
         return _read_fred_csv(path_to_csv)
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         return (f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})")

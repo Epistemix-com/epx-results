@@ -480,7 +480,7 @@ class FREDJob(object):
                    f"date: {date}.")
             raise KeyError(msg)
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         return (
             f"FREDJob(job_key={self.job_key}, job_id={self.job_id}, "
             f"path_to_job={self.path_to_job})"
