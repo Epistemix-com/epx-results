@@ -38,13 +38,13 @@ The first step is to clone the epx-results repository::
 Installing one of the official releases
 ------------------------------------------
 
-All official releases of the code are tagged with their version name, e.g., v1.0.
+All official releases of the code are tagged with their version name, e.g., v1.0.0
 To install a particular release::
 
-	git checkout v1.0
+	git checkout v0.0.0
 	pip install .
 
-This will install the v1.0 release of the code. Other official release versions (e.g., v1.1) can be installed similarly.
+This will install the v0.0.0 release of the code. Other official release versions (e.g., v1.1.0) can be installed similarly.
 
 
 Installing the most recent main branch
@@ -71,7 +71,7 @@ If you use `conda <https://docs.conda.io/en/latest/>`_ to manage your Python dis
 In order to activate this environment::
 
 
-	source activate epx
+	conda activate epx
 
 
 Then install epx-results into this environment::
@@ -83,7 +83,7 @@ Or, alternatively, you can install the latest main branch by following the :ref:
 
 Any additional packages you install into the epx virtual environment will not impact your system-wide environment. Whenever you want work with epx-results, just activate the environment and import the code. When you are done and wish to return to your normal system environment::
 
-	source deactivate
+	conda deactivate
 
 
 .. _epxresults_dependencies:
@@ -110,7 +110,7 @@ check that the version number matches what you expect:
 	print(epxresults.__version__)
 
 If the version number is not what it should be, this likely means you have a previous
-installation that is superseding the version you tried to install. This *should* be accomplished by doing `pip uninstall epxresults` before your new installation, but you may need to uninstall the previous build "manually". Like all python packages, you can find the installation location as follows:
+installation that is superseding the version you tried to install. This *should* be accomplished by doing `pip uninstall epxresults` before your new installation, but you may need to uninstall the previous build "manually". Like all Python packages, you can find the installation location as follows:
 
 .. code:: python
 
@@ -131,8 +131,8 @@ The full testing suite can be run by executing:
 .. code:: python
 
 	import epxresults
-	epxresults.test()  #  v0.5 and earlier
+	epxresults.test()
 
 
-Whether you installed the master branch or a release branch, the message that concludes the execution of the test suite should not indicate that there were any errors or failures. If you encounter problems when running the test suite, please be sure you have installed the package dependencies first before raising a Github Issue and/or contacting the epx-results developers.
+Whether you installed the main branch or a release branch, the message that concludes the execution of the test suite should not indicate that there were any errors or failures. If you encounter problems when running the test suite, please be sure you have installed the package dependencies first before raising a Github Issue and/or contacting the epx-results developers.
 
