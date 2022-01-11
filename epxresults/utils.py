@@ -357,7 +357,7 @@ def _path_to_job(**kwargs) -> Path:
     Other Parameters
     ----------------
     **kwargs: dict
-        additonal optional keyword arguments:
+        additional optional keyword arguments:
 
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
@@ -379,7 +379,7 @@ def _path_to_job(**kwargs) -> Path:
 
     Notes
     -----
-    For details on how the path to a FRED results directoy is resolved,
+    For details on how the path to a FRED results directory is resolved,
     see :py:func:`epxresults.utils._path_to_results`.
 
     :meta public:
@@ -406,6 +406,7 @@ def _path_to_job(**kwargs) -> Path:
     PATH_TO_JOB = os.path.join(PATH_TO_RESULTS, 'JOB/'+str(job_id))
     PATH_TO_JOB = os.path.abspath(PATH_TO_JOB)
 
+    FRED_RESULTS = kwargs.get('FRED_RESULTS')
     if not os.path.isdir(PATH_TO_JOB):
         msg = (f"FRED job ID: '{job_id}' is not present in {FRED_RESULTS}.")
         raise FileNotFoundError(msg)

@@ -48,7 +48,7 @@ class FREDRun(object):
     Other Parameters
     ----------------
     **kwargs: dict
-        additonal optional keyword arguments:
+        additional optional keyword arguments:
 
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
@@ -285,7 +285,7 @@ class FREDRun(object):
         --------
         In the ``'simpleflu'`` model, there are a set of global variables,
         ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
-        number of agents who are susecptible to the ``INF`` condition,
+        number of agents who are susceptible to the ``INF`` condition,
         infected, and recovered.
 
         The daily number of infected agents in run on each day of the
@@ -406,3 +406,6 @@ class FREDRun(object):
         """
         path_to_csv = os.path.join(self.path_to_run, 'CSV', filename)
         return _read_fred_csv(path_to_csv)
+
+    def __str__(self) -> None:
+        return (f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})")

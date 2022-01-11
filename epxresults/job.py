@@ -16,8 +16,8 @@ __author__ = ['Duncan Campbell']
 
 
 # job directory storing output for different intervals
-_interval_dirs = {'daily': 'OUT/PLOT/DAILY',
-                  'Weekly': 'OUT/PLOT/WEEKLY'}
+_INTERVAL_DIRS = {'daily': 'OUT/PLOT/DAILY',
+                  'weekly': 'OUT/PLOT/WEEKLY'}
 # prefix associated with different state counts
 _count_types = {'count': '',
                 'new': 'new',
@@ -44,7 +44,7 @@ class FREDJob(object):
     Other Parameters
     ----------------
     **kwargs: dict
-        additonal optional keyword arguments:
+        additional optional keyword arguments:
 
         FRED_RESULTS : PathLike
             the full path to a local FRED results directory
@@ -53,8 +53,11 @@ class FREDJob(object):
 
     Attributes
     ----------
-    status
-    runs
+    status : str:
+        status of the job (e.g. 'FINISHED')
+    runs : Dict[int, FREDRun]
+        collection of runs belonging to the job. Keys are the FRED run
+        numbers, values are `FREDRun` objects representing the runs.
     path_to_job : Path
         a path to a FRED job results directory
     job_key : str
@@ -273,9 +276,11 @@ class FREDJob(object):
 
         prefix = _count_types[count_type]
         fname = f"{condition}.{prefix}{state}.csv"
-        path_to_file = os.path.join(self.path_to_job,
-                                    f"{_interval_dirs[interval]}",
-                                    f"{fname}")
+        path_to_file = os.path.join(
+            self.path_to_job,
+            self._interval_path_component(interval),
+            fname
+        )
 
         # check if condition is available
         if condition not in self.conditions:
@@ -285,7 +290,9 @@ class FREDJob(object):
 
         if not os.path.isfile(path_to_file):
             msg = (f"'{path_to_file}' not found. `state`={state} may not be "
-                   f"a valid state in the FRED condition '{condition}'.")
+                   f"a valid state in the FRED condition '{condition}'. "
+                   "Alternatively, the output for the requested interval "
+                   "may not be turned on.")
             raise ValueError(msg)
 
         pattern = re.compile("RUN[0-9]+")
@@ -320,7 +327,7 @@ class FREDJob(object):
             a FRED global variable name
 
         interval : str
-            the output inteval
+            the output interval
 
         format : str, optional
             the default DataFrame format, either 'wide' or 'long'. By default,
@@ -341,7 +348,7 @@ class FREDJob(object):
         --------
         In the ``'simpleflu'`` model, there are a set of global variables,
         ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
-        number of agents who are susecptible to the ``INF`` condition,
+        number of agents who are susceptible to the ``INF`` condition,
         infected, and recovered.
 
         The daily number of infected agents in each run on each day of the
@@ -360,9 +367,11 @@ class FREDJob(object):
             raise ValueError(msg)
 
         fname = f"FRED.{variable}.csv"
-        path = os.path.join(self.path_to_job,
-                            f"{_interval_dirs[interval]}",
-                            f"{fname}")
+        path = os.path.join(
+            self.path_to_job,
+            self._interval_path_component(interval),
+            fname
+        )
 
         pattern = re.compile("RUN[0-9]+")
         df = pd.read_csv(path, usecols=lambda x: pattern.match(x))
@@ -380,6 +389,23 @@ class FREDJob(object):
             raise ValueError(msg)
 
         return df
+
+    def _interval_path_component(self, interval: str) -> str:
+        """Get path component needed to find results for given reporting
+        interval from within JOB directory.
+        """
+        if interval not in _INTERVAL_DIRS.keys():
+            raise ValueError(
+                f"'{interval}' is not a valid interval. Provide one of "
+                f"{', '.join(_INTERVAL_DIRS.keys())}"
+            )
+        if not os.path.isdir(
+            os.path.join(self.path_to_job, _INTERVAL_DIRS[interval])
+        ):
+            raise ValueError(
+                f"'{interval}' results were not generated for this job"
+            )
+        return _INTERVAL_DIRS[interval]
 
     def _parse_snapshots(self) -> List[str]:
         """
@@ -429,7 +455,7 @@ class FREDJob(object):
         snapshot : Snapshot
             a FRED snapshot object
 
-        Rasies
+        Raises
         ------
         KeyError
             raised if there is not snapshot for `date` in this FRED job
@@ -437,7 +463,7 @@ class FREDJob(object):
         Examples
         --------
         In the ``'simpleflu'`` model, a snapshot is generated on simulation
-        date January 31, 2020. This snapshot can be retreived by:
+        date January 31, 2020. This snapshot can be retrieved by:
 
         >>> import datetime as dt
         >>> from epxresults import FREDJob
@@ -453,3 +479,9 @@ class FREDJob(object):
             msg = (f"There is no snapshot available for simulation "
                    f"date: {date}.")
             raise KeyError(msg)
+
+    def __str__(self) -> None:
+        return (
+            f"FREDJob(job_key={self.job_key}, job_id={self.job_id}, "
+            f"path_to_job={self.path_to_job})"
+        )
