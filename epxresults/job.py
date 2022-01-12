@@ -57,7 +57,7 @@ class FREDJob(object):
         status of the job (e.g. 'FINISHED')
     runs : Dict[int, FREDRun]
         collection of runs belonging to the job. Keys are the FRED run
-        numbers, values are `FREDRun` objects representing the runs.
+        ID numbers, values are `FREDRun` objects representing the runs.
     path_to_job : Path
         a path to a FRED job results directory
     job_key : str
@@ -392,7 +392,7 @@ class FREDJob(object):
 
     def _interval_path_component(self, interval: str) -> str:
         """Get path component needed to find results for given reporting
-        interval from within JOB directory.
+        interval from within the FRED job directory, ``self.path_to_job``.
         """
         if interval not in _INTERVAL_DIRS.keys():
             raise ValueError(
