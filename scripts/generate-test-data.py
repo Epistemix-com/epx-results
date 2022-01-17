@@ -1,5 +1,5 @@
 """
-This script generates test FRED model data into a local FREED results
+This script generates test FRED model data into a local FRED results
 directory, PKG_TESTS_DIRECTORY, (which is .gitignore'd) so that the unit
 tests in this package have realistic data to work against.
 
@@ -8,11 +8,12 @@ the project:
    docker build -t epistemixpy .
    docker run --rm --env AWS_ACCESS_KEY_ID=<KEY> \
    --env AWS_SECRET_ACCESS_KEY=<SECRET> \
-   -v $(pwd):/models epistemixpy ./scripts/generate-fred-result-data
+   -v $(pwd):/models epistemixpy bash -c "python3 ./scripts/generate-test-data.py"
 """
 
 import os
 from pathlib import Path
+from typing import NamedTuple
 import subprocess
 from unittest.mock import patch
 from utils import is_docker_env, cd
@@ -28,7 +29,25 @@ PKG_TESTS_DIRECTORY = Path(os.path.join(PKG_DIRECTORY, 'tests'))
 PKG_FRED_RESULTS = os.path.join(f'{PKG_TESTS_DIRECTORY}', 'fred-results')
 
 # FRED model tests
-test_models = {'simpleflu': 'simpleflu'}
+class TestModel(NamedTuple):
+    """FRED model to be used to generate sample results to run functional
+    tests against.
+
+    Attributes
+    ----------
+    path_component : str
+        Path relative to ``PKG_TESTS_DIRECTORY`` that contains the FRED code
+        for the test model
+    job_key : str
+        Job key to use when the test model is run
+    """
+    path_component: str
+    job_key: str
+
+test_models = [
+    TestModel('simpleflu', 'simpleflu'),
+    TestModel('simpleflu', 'epx-results_simpleflu')
+]
 locations = ['Jefferson_County_PA']
 num_runs = 3
 num_cores = 1
@@ -55,10 +74,10 @@ def main():
 
     with patch.dict('os.environ', {'FRED_RESULTS': PKG_FRED_RESULTS}):
 
-        for test in test_models.keys():
+        for model in test_models:
 
-            location = test
-            job_key = test_models[location]
+            location = model.path_component
+            job_key = model.job_key
 
             # delete any previously run test job
             args = ['fred_delete', '-f', '-k', job_key]

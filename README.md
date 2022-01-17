@@ -70,7 +70,6 @@ AWS_SECRET_ACCESS_KEY=<your secret access key>
 
 These credentials may be stored in `~/.aws/credentials` on your system.
 
-
 ### Testing Suite
 
 This package comes with a testing suite. To run the testing suite, execute:
@@ -89,7 +88,8 @@ ecr-login
 ./scripts/dev
 ```
 
-This will place you in a Docker environmet. If this fails, please make sure you have completed the steps in the section above about developing in Docker.
+This will place you in a Docker environment. If this fails, please make sure you
+have completed the steps in the section above about developing in Docker.
 
 Within this environment,
 you can then execute:
@@ -102,7 +102,9 @@ to run the testing suite.
 
 ---
 
-In order to run many of the tests in this package, you must generate some example FRED simulation output. This si done autmaticaly when running the full testing suite, but you can regenerate this data yourself by running:
+In order to run many of the tests in this package, you must generate some
+example FRED simulation output. This is done automatically when running the full
+testing suite, but you can regenerate this data yourself by running:
 
 ```terminal
 python ./scripts/generate-test-data.py

@@ -29,6 +29,8 @@ def read(file_name):
 
 VERSION = read("epxresults/VERSION").strip()
 
+dev_requirements = ["tox"]
+
 setup(
     name=PACKAGENAME,
     version=VERSION,
@@ -39,6 +41,7 @@ setup(
     long_description=("A package which contains python tools for interacting "
                       "with local FRED simulation results"),
     install_requires=['pandas', 'pytest'],
+    extras_require={"dev": dev_requirements},
     packages=find_packages(),
     url="https://github.com/Epistemix-com/epx-results",
     package_data={'epxresults': ['VERSION']},

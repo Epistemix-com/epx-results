@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./scripts/generate-fred-result-data
+(cd scripts && python3 generate-test-data.py)
 
 tox -e py38
