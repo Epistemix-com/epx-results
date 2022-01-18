@@ -468,7 +468,7 @@ class FREDJob(object):
         >>> import datetime as dt
         >>> from epxresults import FREDJob
         >>> job = FREDJob(job_key='simpleflu')
-        >>> snap = job.get_snapshot(date=dt.date(2020, 1, 31))
+        >>> snap = job.get_snapshot(date=dt.date(2020, 1, 22))
         """
 
         self._snapshot_map = self._set_snapshot_map()
