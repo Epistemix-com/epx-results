@@ -303,6 +303,7 @@ class FREDJob(object):
             df['sim_day'] = df.index
             df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
             df = df.rename(columns={"RUN": count_type})
+            df = df.swaplevel().sort_index().reset_index()
         elif format == 'wide':
             # do nothing
             pass
@@ -381,6 +382,7 @@ class FREDJob(object):
             df['sim_day'] = df.index
             df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
             df = df.rename(columns={"RUN": variable})
+            df = df.swaplevel().sort_index().reset_index()
         elif format == 'wide':
             # do nothing
             pass

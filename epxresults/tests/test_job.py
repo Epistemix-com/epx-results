@@ -68,3 +68,55 @@ def test_5(pkg_test_env):
     PATH_TO_JOB = os.path.join(FRED_RESULTS, 'JOB', str(test_job_id))
     job = FREDJob(PATH_TO_JOB=PATH_TO_JOB)
     assert job.job_key == 'epx-results_simpleflu'
+
+
+def test_get_job_state_table():
+    job = FREDJob(job_key='epx-results_simpleflu')
+    tot_inf_e_df = job.get_job_state_table('INF', 'E', 'cumulative')
+    new_inf_is_df = job.get_job_state_table('INF', 'Is', 'new')
+    count_inf_ia_df = job.get_job_state_table('INF', 'Ia', 'count')
+
+    assert tot_inf_e_df.columns.to_list() == ['run', 'sim_day', 'cumulative']
+    assert new_inf_is_df.columns.to_list() == ['run', 'sim_day', 'new']
+    assert count_inf_ia_df.columns.to_list() == ['run', 'sim_day', 'count']
+
+    test_dfs = [tot_inf_e_df, new_inf_is_df, count_inf_ia_df]
+    for df in test_dfs:
+        assert df['run'].dtype == 'int64'
+        assert df['sim_day'].dtype == 'int64'
+        data_col = [x for x in df.columns if x not in ['run', 'sim_day']][0]
+        assert df[data_col].dtype == 'int64'
+
+        # Job contains 3 runs from 2020-01-01 to 2020-01-30. That's
+        # 3 * 30 = 90 days in total
+        assert len(df.index) == 90
+
+        # Runs are 1-indexed
+        assert df.iloc[0]['run'] == 1
+        assert df.iloc[-1]['run'] == 3
+
+        # sim days are 0-indexed
+        assert df.iloc[0]['sim_day'] == 0
+        assert df.iloc[-1]['sim_day'] == 29
+
+
+def test_get_job_variable_table():
+    job = FREDJob(job_key='epx-results_simpleflu')
+    recovered_df = job.get_job_variable_table('Recovered')
+
+    assert recovered_df.columns.to_list() == ['run', 'sim_day', 'Recovered']
+    assert recovered_df['run'].dtype == 'int64'
+    assert recovered_df['sim_day'].dtype == 'int64'
+    assert recovered_df['Recovered'].dtype == 'float64'
+
+    # Job contains 3 runs from 2020-01-01 to 2020-01-30. That's
+    # 3 * 30 = 90 days in total
+    assert len(recovered_df.index) == 90
+
+    # Runs are 1-indexed
+    assert recovered_df.iloc[0]['run'] == 1
+    assert recovered_df.iloc[-1]['run'] == 3
+
+    # sim days are 0-indexed
+    assert recovered_df.iloc[0]['sim_day'] == 0
+    assert recovered_df.iloc[-1]['sim_day'] == 29
