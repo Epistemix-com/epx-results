@@ -1,10 +1,10 @@
 """
 """
-
+from itertools import chain, repeat
 import os
 import re
 import datetime as dt
-from typing import (Dict, List, Optional, Tuple, Union)
+from typing import (Dict, List, Tuple)
 import pandas as pd
 from .utils import (_path_to_job, _path_to_results,
                     return_job_id, return_job_run_ids)
@@ -481,6 +481,18 @@ class FREDJob(object):
             msg = (f"There is no snapshot available for simulation "
                    f"date: {date}.")
             raise KeyError(msg)
+
+    def get_job_date_table(self) -> pd.DataFrame:
+        return (
+            pd.DataFrame.from_records(
+                chain(*[
+                    zip(repeat(i), self.runs[i].sim_days, self.runs[i].sim_dates)
+                    for i in self.runs.keys()
+                ]),
+                columns=["run", "sim_day", "sim_date"]
+            )
+            .assign(sim_date=lambda df: pd.to_datetime(df["sim_date"]))
+        )
 
     def __str__(self) -> str:
         return (
