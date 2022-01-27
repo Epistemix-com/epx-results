@@ -28,7 +28,7 @@ demonstrate usage and features of this package. If FRED is installed at the time
 epx-results is installed, this simulation will be run and may alreay be available.
 If this is not the case, the "simpleflu" model can be run by executing::
 
-   pytyhon ./scripts/generate-test-data.py
+   python ./scripts/generate-test-data.py
 
 
 
@@ -38,3 +38,7 @@ Tutorials
 
 Tutorials on the use of the epx-results package are coming soon.
 
+.. toctree::
+   :maxdepth: 1
+
+   reading_variables
