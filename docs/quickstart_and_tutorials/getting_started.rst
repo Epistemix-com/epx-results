@@ -2,9 +2,9 @@
 
 .. _getting_started:
 
-******************************
+********************************
 Getting started with epx-results
-******************************
+********************************
 
 This 10-minute guide gives an overview of the functionality of epx-results
 and each of its sub-packages. You can find links to more detailed information in
@@ -13,7 +13,7 @@ already followed the :ref:`step_by_step_install` section of the documentation to
 and its dependencies set up on your machine.
 
 Importing epx-results
-===================
+=====================
 
 After installing epx-results you can open up a Python terminal and load the entire package by:
 
