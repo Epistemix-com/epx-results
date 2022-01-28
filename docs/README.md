@@ -5,10 +5,23 @@ The documentation for this project is built with [Sphinx](https://www.sphinx-doc
 
 ## building the docs locally
 
+Ensure you have installed the `doc-shared` submodule dependencies
+
+```shell
+git submodule update --init
+```
+
+Install Sphinx requirements (note this is `docs/requirements.txt` as opposed to
+the project root's `requirements.txt`)
+
+```shell
+python -m pip install -r requirements.txt
+```
+
 To build the documentation for epx-results locally, execute the following command:
 
 ```terminal
-make html
+make clean html
 ```
 
 This builds the documentation in `./_build/html`. On a Mac, this can be opened in a browser by:
