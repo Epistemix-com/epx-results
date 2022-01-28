@@ -75,6 +75,8 @@ class FREDJob(object):
         Get a table of global variable values for each run in a job.
     get_job_state_table :
         Get a table of state counts in a condition for each run in a job.
+    get_job_date_table :
+        Mapping of simulation days to simulation dates.
 
     Notes
     -----
@@ -483,6 +485,23 @@ class FREDJob(object):
             raise KeyError(msg)
 
     def get_job_date_table(self) -> pd.DataFrame:
+        """Table mapping sim days to sim dates for all runs in the job.
+
+        Returns
+        -------
+        pd.DataFrame
+            Table with columns ``run``, ``sim_day``, and ``sim_date``.
+            ``sim_date`` is the date represented by ``sim_day`` in
+            the simulation, and ``run`` is the FRED run number. Normally
+            we expect all runs in a job to have the same ``sim_day`` and
+            ``sim_date`` mappings but this is not enforced.
+
+        Examples
+        --------
+        >>> from epxresults import FREDJob
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> df = job.get_job_date_table()
+        """
         return (
             pd.DataFrame.from_records(
                 chain(*[

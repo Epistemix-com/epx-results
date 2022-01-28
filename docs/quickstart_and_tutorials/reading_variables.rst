@@ -1,7 +1,7 @@
 .. _reading_variables:
 
 *********************************************
-Reading global varialbes with ``epx-results``
+Reading global variables with ``epx-results``
 *********************************************
 
 ``epx-results`` provides a Python interface to retrieve FRED global variable
@@ -9,7 +9,7 @@ data as a ``pandas.DataFrame`` object. This is provided by the
 :meth:`epxresults.FREDJob.get_job_variable_table` method. First instantiate a
 :class:`epxresults.FREDJob` object representing your job.
 
-.. code-block: python
+.. code-block:: python
 
     >>> from epxresults import FREDJob
     >>> job = FREDJob(job_key="simpleflu")
@@ -17,7 +17,7 @@ data as a ``pandas.DataFrame`` object. This is provided by the
 The ``simpleflu`` model contains a global variable called ``Infected``. This can
 be read by calling the :meth:`epxresults.FREDJob.get_job_variable_table` method.
 
-.. code-block: python
+.. code-block:: python
 
     >>> infected_df = job.get_job_variable_table("Infected")
     >>> infected_df
@@ -52,7 +52,7 @@ corresponds to. A common pattern is to:
 
 This can be achieved with the following code snippet.
 
-.. code-block: python
+.. code-block:: python
 
     >>> import numpy as np
     >>> dates_df = job.get_job_date_table()
