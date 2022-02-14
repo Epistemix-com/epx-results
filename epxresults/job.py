@@ -4,7 +4,7 @@ from itertools import chain, repeat
 import os
 import re
 import datetime as dt
-from typing import (Dict, List, Tuple)
+from typing import Dict, List, Literal, Tuple
 import pandas as pd
 from .utils import (_path_to_job, _path_to_results,
                     return_job_id, return_job_run_ids)
@@ -18,6 +18,8 @@ __author__ = ['Duncan Campbell']
 # job directory storing output for different intervals
 _INTERVAL_DIRS = {'daily': 'OUT/PLOT/DAILY',
                   'weekly': 'OUT/PLOT/WEEKLY'}
+OutputInterval = Literal['daily', 'weekly']
+
 # prefix associated with different state counts
 _count_types = {'count': '',
                 'new': 'new',
@@ -215,13 +217,13 @@ class FREDJob(object):
         return conditions, global_variables
 
     def get_job_state_table(
-            self,
-            condition: str,
-            state: str,
-            count_type: str = 'cumulative',
-            interval: str = 'daily',
-            format: str = 'long'
-            ) -> pd.DataFrame:
+        self,
+        condition: str,
+        state: str,
+        count_type: str = "cumulative",
+        interval: OutputInterval = "daily",
+        format: str = "long",
+    ) -> pd.DataFrame:
         """
         Return a table of state counts in `condition` for each run in a job.
 
@@ -273,54 +275,44 @@ class FREDJob(object):
 
         # check `count_type` keyword argument
         if count_type not in _count_types.keys():
-            msg = (f"`count_type` must be one of {_count_types.keys()}")
+            msg = f"`count_type` must be one of {_count_types.keys()}"
             raise ValueError(msg)
 
         prefix = _count_types[count_type]
         fname = f"{condition}.{prefix}{state}.csv"
         path_to_file = os.path.join(
-            self.path_to_job,
-            self._interval_path_component(interval),
-            fname
+            self.path_to_job, self._interval_path_component(interval), fname
         )
 
         # check if condition is available
         if condition not in self.conditions:
-            msg = (f"{condition} is not available to load. "
-                   "See `self.conditions` for a list of available conditions.")
+            msg = (
+                f"{condition} is not available to load. "
+                "See `self.conditions` for a list of available conditions."
+            )
             raise ValueError(msg)
 
         if not os.path.isfile(path_to_file):
-            msg = (f"'{path_to_file}' not found. `state`={state} may not be "
-                   f"a valid state in the FRED condition '{condition}'. "
-                   "Alternatively, the output for the requested interval "
-                   "may not be turned on.")
+            msg = (
+                f"'{path_to_file}' not found. `state`={state} may not be "
+                f"a valid state in the FRED condition '{condition}'. "
+                "Alternatively, the output for the requested interval "
+                "may not be turned on."
+            )
             raise ValueError(msg)
 
-        pattern = re.compile("RUN[0-9]+")
-        df = pd.read_csv(path_to_file, usecols=lambda x: pattern.match(x))
-        df.index.name = 'sim_day'
-
-        if format == 'long':
-            df['sim_day'] = df.index
-            df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
-            df = df.rename(columns={"RUN": count_type})
-            df = df.swaplevel().sort_index().reset_index()
-        elif format == 'wide':
-            # do nothing
-            pass
-        else:
-            msg = (f"Requested DataFrame format, {format}, not recognized.")
-            raise ValueError(msg)
+        df = self._read_plot_data_file(path_to_file, interval)
+        self._validate_table_format(format)
+        if format == "long":
+            df = self._convert_wide_plot_table_to_long(df, count_type)
 
         return df
 
     def get_job_variable_table(
-            self,
-            variable: str,
-            interval: str = 'daily',
-            format: str = 'long'
-            ) -> pd.DataFrame:
+        self, variable: str,
+        interval: OutputInterval = "daily",
+        format: str = "long",
+    ) -> pd.DataFrame:
         """
         Return a table of `variable` values for each run in a job.
 
@@ -364,35 +356,103 @@ class FREDJob(object):
 
         # check if variable is available
         if variable not in self.global_variables:
-            msg = (f"{variable} is not available to load. See "
-                   "`self.global_variables` for a list of "
-                   "available variables.")
+            msg = (
+                f"{variable} is not available to load. See "
+                "`self.global_variables` for a list of "
+                "available variables."
+            )
             raise ValueError(msg)
 
         fname = f"FRED.{variable}.csv"
         path = os.path.join(
-            self.path_to_job,
-            self._interval_path_component(interval),
-            fname
+            self.path_to_job, self._interval_path_component(interval), fname
         )
 
-        pattern = re.compile("RUN[0-9]+")
-        df = pd.read_csv(path, usecols=lambda x: pattern.match(x))
-        df.index.name = 'sim_day'
-
-        if format == 'long':
-            df['sim_day'] = df.index
-            df = pd.wide_to_long(df, ["RUN"], i="sim_day", j="run")
-            df = df.rename(columns={"RUN": variable})
-            df = df.swaplevel().sort_index().reset_index()
-        elif format == 'wide':
-            # do nothing
-            pass
-        else:
-            msg = (f"Requested DataFrame format, {format}, not recognized.")
-            raise ValueError(msg)
+        df = self._read_plot_data_file(path, interval)
+        self._validate_table_format(format)
+        if format == "long":
+            df = self._convert_wide_plot_table_to_long(df, variable)
 
         return df
+
+    def _read_plot_data_file(
+        self, filename: str, interval: OutputInterval
+    ) -> pd.DataFrame:
+        """Read a file from the ``JOB/<n>/OUT/PLOT/<interval>`` directory for
+        the job.
+
+        FRED outputs summary tables for all state, global variable, and special
+        variable (e.g Popsize, Rt) outputs in the
+        ``JOB/<n>/OUT/PLOT/<interval>`` directory. These files have a row for
+        each sim day, and include some summary statistics, as well as a column
+        for each run.
+
+        This utility function reads the given file for the given output
+        interval, and returns a table with a column for each run, and the
+        sim_day as index.
+
+        Examples
+        --------
+        >>> job._read_plot_file('FRED.my_var.txt', 'daily').head()  # doctest: +SKIP
+                 RUN1  RUN2  RUN3  RUN4  RUN5
+        sim_day
+        0         0.0   0.0   0.0   0.0   0.0
+        1         0.0   0.0   0.0   0.0   0.0
+        2         0.0   0.0   0.0   0.0   0.0
+        3         0.0   0.0   0.0   0.0   0.0
+        4         0.0   0.0   0.0   0.0   0.0
+        """
+        filepath = os.path.join(
+            self.path_to_job, self._interval_path_component(interval), filename
+        )
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f"{filepath} does not exist.")
+        pattern = re.compile("RUN[0-9]+")
+        df = pd.read_csv(filepath, usecols=lambda x: pattern.match(x))
+        df.index.name = "sim_day"
+        return df
+
+    @staticmethod
+    def _convert_wide_plot_table_to_long(
+        wide_plot_df: pd.DataFrame, varname: str
+    ) -> pd.DataFrame:
+        """Given FRED plot table in wide format, convert to tidy long format.
+
+        FRED generates output files for variables in the
+        ``JOB/<n>/OUT/PLOT/<interval>`` that are in a 'wide' format that has a
+        row per sim day and a column per run. This utility function converts
+        dataframes in the wide format to dataframes in 'long' format with
+        a row for each (run, sim day) pair and columns:
+
+        * run
+        * sim_day
+        * <name of variable>
+
+        Examples
+        --------
+        >>> wide_df = job._read_plot_file('FRED.my_var', 'daily')  # doctest: +SKIP
+        >>> job._convert_wide_plot_table_to_long(wide_df, 'my_var')  # doctest: +SKIP
+           run  sim_day  my_var
+        0    1        0     0.0
+        1    1        1     0.0
+        2    1        2     0.0
+        3    1        3     0.0
+        4    1        4     0.0
+        """
+        wide_plot_df["sim_day"] = wide_plot_df.index
+        df = pd.wide_to_long(wide_plot_df, ["RUN"], i="sim_day", j="run")
+        df = df.rename(columns={"RUN": varname})
+        df = df.swaplevel().sort_index().reset_index()
+        return df
+
+    @staticmethod
+    def _validate_table_format(format: str) -> None:
+        valid_formats = ["wide", "long"]
+        if format not in valid_formats:
+            raise ValueError(
+                f"{format} is not a valid table format. Use one "
+                f"of: {', '.join(valid_formats)}"
+            )
 
     def _interval_path_component(self, interval: str) -> str:
         """Get path component needed to find results for given reporting
