@@ -1,6 +1,7 @@
 """
 """
 from itertools import chain, repeat
+import logging
 import os
 import re
 import datetime as dt
@@ -13,6 +14,8 @@ from .snapshot import Snapshot
 
 __all__ = ['FREDJob']
 __author__ = ['Duncan Campbell']
+
+logger = logging.getLogger(__name__)
 
 
 # job directory storing output for different intervals
@@ -309,7 +312,8 @@ class FREDJob(object):
         return df
 
     def get_job_variable_table(
-        self, variable: str,
+        self,
+        variable: str,
         interval: OutputInterval = "daily",
         format: str = "long",
     ) -> pd.DataFrame:
@@ -373,6 +377,81 @@ class FREDJob(object):
         if format == "long":
             df = self._convert_wide_plot_table_to_long(df, variable)
 
+        return df
+
+    def get_job_rt_table(
+        self, condition: str, interval: OutputInterval = "daily", format: str = "long"
+    ) -> pd.DataFrame:
+        """Time series of the reproductive rate, R(t), of the given
+        transmissible condition.
+
+        See `FRED documentation`_ for further details of the definition of this
+        quantity.
+
+        .. _FRED documentation: https://docs.epistemix.com/projects/fred-sims/en/latest/sim-guide/chapter2.html#reproductive-rate-rt
+
+        Examples
+        --------
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> df = job.get_job_rt_table('INF').head()
+        >>> df  # doctest: +SKIP
+           run  sim_day        Rt
+        0    1        0  1.700000
+        1    1        1  0.000000
+        2    1        2  3.500000
+        3    1        3  2.500000
+        4    1        4  2.666667
+        """
+        self._validate_table_format(format)
+        filename = f"{condition}.Rt.csv"
+
+        try:
+            df = self._read_plot_data_file(filename, interval)
+        except FileNotFoundError:
+            logger.error(
+                f"Rt output data could not be found for condition {condition} "
+                f"at {interval} frequency. Check expected outputs are on and "
+                f"that condition is transmissible."
+            )
+        if format == "long":
+            df = self._convert_wide_plot_table_to_long(df, "Rt")
+        return df
+
+    def get_job_gt_table(
+        self, condition: str, interval: OutputInterval = "daily", format: str = "long"
+    ) -> pd.DataFrame:
+        """Time series of the generation time, G(t), of the given
+        transmissible condition.
+
+        See `FRED documentation`_ for further details of the definition of this
+        quantity.
+
+        .. _FRED documentation: https://docs.epistemix.com/projects/fred-sims/en/latest/sim-guide/chapter2.html#generation-time-gt
+
+        Examples
+        --------
+        >>> job = FREDJob(job_key='simpleflu')
+        >>> df = job.get_job_gt_table('INF').head()
+        >>> df  # doctest: +SKIP
+           run  sim_day        Gt
+        0    1        0  5.676471
+        1    1        1  0.000000
+        2    1        2  5.404762
+        3    1        3  5.291667
+        4    1        4  3.130208
+        """
+        self._validate_table_format(format)
+        filename = f"{condition}.Gt.csv"
+        try:
+            df = self._read_plot_data_file(filename, interval)
+        except FileNotFoundError:
+            logger.error(
+                f"Gt output data could not be found for condition {condition} "
+                f"at {interval} frequency. Check expected outputs are on and "
+                f"that condition is transmissible."
+            )
+        if format == "long":
+            df = self._convert_wide_plot_table_to_long(df, "Gt")
         return df
 
     def _read_plot_data_file(

@@ -140,3 +140,27 @@ def test_job_get_job_date_table():
     # sim days are 0-indexed
     assert dates_df.iloc[0]['sim_day'] == 0
     assert dates_df.iloc[-1]['sim_day'] == 29
+
+
+def test_get_job_rt_table():
+    job = FREDJob(job_key='epx-results_simpleflu')
+    rt_wide_df = job.get_job_rt_table('INF', format='wide')
+    assert rt_wide_df.columns.tolist() == ['RUN1', 'RUN2', 'RUN3']
+    assert rt_wide_df.index.name == 'sim_day'
+    assert rt_wide_df.index.max() == 29  # 0-indexed, 30 days in test simulation
+
+    rt_long_df = job.get_job_rt_table('INF')  # long format is default
+    assert rt_long_df.columns.tolist() == ['run', 'sim_day', 'Rt']
+    assert len(rt_long_df.index) == 90  # 3 runs X 30 day = 90
+
+
+def test_get_job_gt_table():
+    job = FREDJob(job_key='epx-results_simpleflu')
+    gt_wide_df = job.get_job_gt_table('INF', format='wide')
+    assert gt_wide_df.columns.tolist() == ['RUN1', 'RUN2', 'RUN3']
+    assert gt_wide_df.index.name == 'sim_day'
+    assert gt_wide_df.index.max() == 29  # 0-indexed, 30 days in test simulation
+
+    gt_long_df = job.get_job_gt_table('INF')  # long format is default
+    assert gt_long_df.columns.tolist() == ['run', 'sim_day', 'Gt']
+    assert len(gt_long_df.index) == 90  # 3 runs X 30 day = 90
