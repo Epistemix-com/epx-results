@@ -384,7 +384,7 @@ class FREDRun(object):
             return_as_df = False,
             ) -> Dict:
         """
-        Return a table variable a table variable series.
+        Return a table variable as a series.
 
         Parameters
         ----------
