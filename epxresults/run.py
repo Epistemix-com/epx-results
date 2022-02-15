@@ -326,7 +326,7 @@ class FREDRun(object):
             sim_day: int = None,
             ) -> pd.Series:
         """
-        Return an array of values for a global list varibale.
+        Return an array of values for a global list variable.
 
         Parameters
         ----------
@@ -376,6 +376,52 @@ class FREDRun(object):
                 arr.append(value)
                 count += 1
         return pd.Series(arr, dtype='float')
+
+    def get_table_variable(
+            self,
+            variable: str,
+            sim_day: int = None,
+            return_as_df = False,
+            ) -> Dict:
+        """
+        Return a table variable a table variable series.
+
+        Parameters
+        ----------
+        variable : str
+            a FRED table variable name
+
+        sim_day : int
+            the simulation day. By default, the last output will be returned.
+
+        Returns
+        -------
+        arr : pd.Series
+            a series of floats containing `variable` values indexed by keys
+        """
+
+        if sim_day is not None:
+            fname = f"{variable}-{sim_day}.txt"
+        else:
+            fname = f"{variable}.txt"
+        fname = os.path.join(self.path_to_run, 'LIST', fname)
+
+        if not os.path.isfile(fname):
+            msg = (f"The requested output for `{variable}` was not found in "
+                   f"{os.path.join(self.path_to_run, 'LIST')}")
+            raise FileNotFoundError(msg)
+
+        # read in data from file
+        d = {}
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+            count = 0
+            for line in lines[1:]:
+                key, value = line.strip().split(',')
+                d[key] = value
+                count += 1
+
+        return pd.Series(d, name=variable)
 
     def get_csv_output(self, filename):
         """
