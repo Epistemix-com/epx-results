@@ -381,7 +381,6 @@ class FREDRun(object):
             self,
             variable: str,
             sim_day: int = None,
-            return_as_df = False,
             ) -> Dict:
         """
         Return a table variable as a series.
