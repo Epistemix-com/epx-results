@@ -567,6 +567,7 @@ class FREDJob(object):
         self._snapshot_map = {}
         for snapshot_file in self._parse_snapshots():
             snapshot = Snapshot(PATH_TO_SNAPSHOT=os.path.join(self.path_to_job,
+                                                              'OUT',
                                                               snapshot_file))
             if snapshot.date is not None:
                 self._snapshot_map[snapshot.date] = snapshot

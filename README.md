@@ -28,11 +28,32 @@ You may then import epx-results in Python,
 
 ### Local Development
 
-When actively working on this package, it is often convenient to install epx-results in
-an environment in "editable" mode using the `-e` opiton to `pip`:
+To set up a fresh development environment to to work on `epx-results`, we
+recommend using Python's built in `venv` module to create a fresh virtual
+environment. This helps to ensure that if something stops working in the
+development environment, the explanation is inside the `epx-results` repository
+itself, rather than because of some other software installed in a general
+purpose environment.
 
-```terminal
-$user: pip install -e .
+Start by activating a Python environment containing a Python
+executable with the same version you want to use for package development (e.g.
+3.8).
+
+```shell
+$ conda activate epistemix-modeling
+$ which python 
+/opt/miniconda3/envs/epistemix-modeling/bin/python
+$ python -m venv .venv
+$ source .venv/bin/activate
+$ which python
+/Users/username/Projects/epx-results/.venv/bin/python
+```
+
+When actively working on this package, it is often convenient to install
+epx-results in an environment in "editable" mode using the `-e` option to `pip`:
+
+```shell
+pip install -e .
 ```
 
 ### Local Development with Docker
