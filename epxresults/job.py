@@ -7,8 +7,17 @@ import re
 import datetime as dt
 from typing import Dict, List, Literal, Tuple
 import pandas as pd
-from .utils import (_path_to_job, _path_to_results,
-                    return_job_id, return_job_run_ids)
+import shutil
+from pathlib import Path
+from .utils import (
+    _path_to_job,
+    _path_to_results,
+    return_job_id,
+    return_job_run_ids,
+    _is_valid_results_directory,
+    load_local_job_keys
+)
+from .insert import _write_local_keys
 from .run import FREDRun
 from .snapshot import Snapshot
 
@@ -110,6 +119,67 @@ class FREDJob(object):
         self.job_id = self._return_job_id(**kwargs)
         self.conditions, self.global_variables = self._parse_vars()
         self._snapshot_map = self._set_snapshot_map()
+        self._results = self._fred_results(**kwargs)
+
+    def _fred_results(self, **kwargs) -> Path:
+        """
+        The FRED results directory associated with the job
+
+        Notes
+        -----
+        If no results directory is associated with the job, `None` will be
+        returned.
+        """
+
+        if 'PATH_TO_JOB' in kwargs.keys():
+            root = Path(self.path_to_job).parent
+            while root != Path('/'):
+                if _is_valid_results_directory(root):
+                    return root
+                else:
+                    root = root.parent
+            return None
+        else:
+            return Path(_path_to_results(**kwargs))
+
+    def delete(self, force=False, verbose=False):
+        """
+        Delete the FRED job
+        """
+
+        if force is False:
+            permission_to_delete = None
+            q = (f"Are you sure you want to delete job {self.job_key}?")
+            while permission_to_delete is None:
+                reply = str(input(q + ' (y/n): ')).lower().strip()
+                if reply[0] == 'y':
+                    permission_to_delete = True
+                if reply[0] == 'n':
+                    permission_to_delete = False
+        else:
+            permission_to_delete = True
+
+        if permission_to_delete is False:
+            msg = (f"job {self.job_key} could not be deleted.")
+            raise RuntimeError(msg)
+        elif self._results is None:
+            shutil.rmtree(self.path_to_job)
+            if verbose:
+                print(f"deleting {self.path_to_job}.")
+        else:
+            local_keys = load_local_job_keys()
+            try:
+                shutil.rmtree(self.path_to_job)
+                del local_keys[self.job_key]
+                _write_local_keys(local_keys, FRED_RESULTS=self._results)
+                if verbose:
+                    print(f"deleting {self.path_to_job}.")
+                    print(f"updating KEY and ID file in {self._results}")
+            except RuntimeError:
+                msg = (f"job {self.job_key} could not be deleted."
+                       f"You may not have permission to modify "
+                       f"{self.path_to_job} or {self._results}")
+                raise RuntimeError(msg)
 
     @property
     def status(self) -> str:

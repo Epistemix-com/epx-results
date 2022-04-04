@@ -570,3 +570,28 @@ def _read_list_variable_file(
     df = pd.DatFrame(np.array([float(x) for x in list_data[1:]]))
 
     return df
+
+
+def _is_valid_results_directory(path) -> bool:
+    """
+    Determine if `path` is consistent with being a FRED results directory.
+
+    Parameters
+    ----------
+    path : path-like
+        a path to a potential FRED results directory
+
+    Returns
+    -------
+    is_valid : bool
+        returns True if `path` appears to be a valid FRED results directory
+    """
+
+    if not os.path.isdir(os.path.join(path, 'JOB')):
+        return False
+    elif not os.path.isfile(os.path.join(path, 'ID')):
+        return False
+    elif not os.path.isfile(os.path.join(path, 'KEY')):
+        return False
+    else:
+        return True

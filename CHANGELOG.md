@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- added `delete` method to `FREDJob` class.
+
 ## [0.0.1] - 2022-02-28
 
 ### Added
