@@ -8,6 +8,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- added a method to FREDRun, get_table_variable, that loads table varibale out for a FRED run.
+
+### Fixed
+
+
 ## [0.0.1] - 2022-02-28
 
 ### Added
