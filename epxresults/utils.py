@@ -9,6 +9,7 @@ from warnings import warn
 from typing import (Dict, List, Optional, Tuple, Union)
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 
 __all__ = ['load_local_job_keys', 'return_job_id', 'return_job_run_ids']
@@ -313,10 +314,10 @@ def _inferred_path_to_results() -> None:
     if FRED_RESULTS is None:
         FRED_HOME = os.getenv('FRED_HOME')
         if FRED_HOME is None:
-            msg = (f"Neither 'FRED_RESULTS' nor 'FRED_HOME' are set "
-                   f"as an environmental variable. As a result, the "
-                   f"location of a local FRED results directory could "
-                   f"not be inferred.")
+            msg = ("Neither 'FRED_RESULTS' nor 'FRED_HOME' are set "
+                   "as an environmental variable. As a result, the "
+                   "location of a local FRED results directory could "
+                   "not be inferred.")
             raise RuntimeError(msg)
         else:
             FRED_RESULTS = os.path.join(FRED_HOME, 'results')
@@ -395,7 +396,6 @@ def _path_to_job(**kwargs) -> Path:
     if 'job_id' in kwargs.keys():
         job_id = kwargs['job_id']
     elif 'job_key' in kwargs.keys():
-        job_key = kwargs['job_key']
         job_id = return_job_id(**kwargs)
     else:
         msg = ("Either `job_key`, `job_id`, or `PATH_TO_JOB` must be passed "
