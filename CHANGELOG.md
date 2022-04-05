@@ -32,3 +32,4 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Update Read the Docs config so documentation builds correctly
+- update FREDRun class doc strings

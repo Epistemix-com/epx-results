@@ -1,5 +1,8 @@
 """
+This module contains tools for representing FRED jobs. FRED jobs are
+collections of FRED simulation runs.
 """
+
 from itertools import chain, repeat
 import logging
 import os
