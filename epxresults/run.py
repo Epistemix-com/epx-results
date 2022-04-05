@@ -1,12 +1,12 @@
 """
+This module provides tools for representing FRED simulation "runs".
 """
 
 import os
 import re
-import numpy as np
 import pandas as pd
 import datetime as dt
-from typing import (Dict, List, Optional, Tuple, Union)
+from typing import (Dict, List, Tuple, Union)
 from .utils import (_path_to_run, _value_str_to_value, _read_fred_csv)
 from .run_logs import _read_fred_run_log
 
@@ -74,6 +74,16 @@ class FREDRun(object):
         get a FRED run log
     get_csv_output :
         get a CSV file output from a FRED run
+    get_state :
+        get state counts in a condition
+    get_variable :
+        get the value of a global variable
+    get_list_variable :
+        get the value of a global list variable
+    get_table_variable :
+        get the value of a table variable
+    get_csv_output :
+        load a CSV file
 
     Notes
     -----
@@ -266,7 +276,7 @@ class FREDRun(object):
             interval: str = 'daily'
             ) -> pd.Series:
         """
-        Return an array of values for a global varibale.
+        Return an series of values for a global variable.
 
         Parameters
         ----------
@@ -326,7 +336,7 @@ class FREDRun(object):
             sim_day: int = None,
             ) -> pd.Series:
         """
-        Return an array of values for a global list variable.
+        Return an series of values for a global list variable.
 
         Parameters
         ----------
@@ -381,7 +391,7 @@ class FREDRun(object):
             self,
             variable: str,
             sim_day: int = None,
-            ) -> Dict:
+            ) -> pd.Series:
         """
         Return a table variable as a series.
 
@@ -422,7 +432,7 @@ class FREDRun(object):
 
         return pd.Series(d, name=variable)
 
-    def get_csv_output(self, filename):
+    def get_csv_output(self, filename: str) -> pd.DataFrame:
         """
         Load CSV output from a FRED run.
 
