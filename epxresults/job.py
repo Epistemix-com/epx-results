@@ -7,8 +7,17 @@ import re
 import datetime as dt
 from typing import Dict, List, Literal, Tuple
 import pandas as pd
-from .utils import (_path_to_job, _path_to_results,
-                    return_job_id, return_job_run_ids)
+import shutil
+from pathlib import Path
+from .utils import (
+    _path_to_job,
+    _path_to_results,
+    return_job_id,
+    return_job_run_ids,
+    _is_valid_results_directory,
+    load_local_job_keys
+)
+from .insert import _write_local_keys
 from .run import FREDRun
 from .snapshot import Snapshot
 
@@ -110,6 +119,86 @@ class FREDJob(object):
         self.job_id = self._return_job_id(**kwargs)
         self.conditions, self.global_variables = self._parse_vars()
         self._snapshot_map = self._set_snapshot_map()
+        self._results_dir = self._fred_results(**kwargs)
+
+    def _fred_results(self, **kwargs) -> Path:
+        """
+        The FRED results directory associated with the job
+
+        Notes
+        -----
+        If no results directory is associated with the job, `None` will be
+        returned.
+        """
+
+        if 'PATH_TO_JOB' in kwargs.keys():
+            root = Path(self.path_to_job).parent.parent
+            if _is_valid_results_directory(root):
+                return root
+            else:
+                return None
+        else:
+            return Path(_path_to_results(**kwargs))
+
+    def delete(self, verbose: bool = False) -> None:
+        """
+        Delete the FRED job results on your local file system. Deleting a job
+        is irreversible.
+
+        Parameters
+        ----------
+        verbose : bool
+            print progress and status information
+
+        Notes
+        -----
+        This method both removes the ``self.path_to_job`` directory on a file
+        system and updates the local results ``KEY`` and ``ID`` file if the job
+        is contained within a valid local FRED results directory.
+
+        Raises
+        ------
+        PermissionError
+            If the user has insufficient privileges to remove the FRED job from
+            the local file system.
+        FileNotFoundError
+            If the job has already been removed from the local file system
+            and/or the job is contained within in a non-standard local FRED
+            results directory.
+        """
+
+        # update job keys in local results directory
+        if self._results_dir is not None:
+            if verbose:
+                print(f"updating local results {self._results_dir}.")
+            local_keys = load_local_job_keys(FRED_RESULTS=self._results_dir)
+            try:
+                del local_keys[self.job_key]
+            except KeyError:
+                if verbose:
+                    msg = (f"no job key matching {self.job_key} found in "
+                           f"the local FRED results {self._results_dir}.")
+            try:
+                _write_local_keys(local_keys, FRED_RESULTS=self._results_dir)
+            except PermissionError:
+                msg = (f"job {self.job_key} could not be deleted from the "
+                       f"local FRED results directory {self._results_dir}. "
+                       f"You may not have permission to modify the directory.")
+                raise PermissionError(msg)
+
+        # delete job results directory
+        try:
+            if verbose:
+                print(f"deleting {self.path_to_job}.")
+            shutil.rmtree(self.path_to_job)
+        except PermissionError:
+            msg = (f"job {self.job_key} could not be deleted."
+                   f"You may not have permission to modify {self.path_to_job}")
+            raise PermissionError(msg)
+        except FileNotFoundError:
+            msg = (f"{self.path_to_job} does not exist. It may have been "
+                   "previously deleted.")
+            raise FileNotFoundError(msg)
 
     @property
     def status(self) -> str:
