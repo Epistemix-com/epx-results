@@ -186,7 +186,7 @@ def _write_local_keys(job_keys, **kwargs) -> None:
 
     Notes
     -----
-    This function will overwrite any exisiting KEY and/or ID
+    This function will overwrite any existing KEY and/or ID
     file in a FRED results directory.
     """
 
@@ -204,7 +204,11 @@ def _write_local_keys(job_keys, **kwargs) -> None:
     # write ID file
     filename = os.path.join(FRED_RESULTS, 'ID')
     with open(filename, 'w') as f:
-        f.write("{0}\n".format(str(max(job_keys.values()) + 1)))
+        if job_keys=={}:
+            # all jobs have been deleted
+            f.write("{0}\n".format(1))
+        else:
+            f.write("{0}\n".format(str(max(job_keys.values()) + 1)))
 
 
 def _is_valid_fred_job_key(job_key: str) -> bool:
