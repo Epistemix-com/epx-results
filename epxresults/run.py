@@ -6,21 +6,18 @@ import os
 import re
 import pandas as pd
 import datetime as dt
-from typing import (Dict, List, Tuple, Union)
-from .utils import (_path_to_run, _value_str_to_value, _read_fred_csv)
+from typing import Dict, List, Tuple, Union
+from .utils import _path_to_run, _value_str_to_value, _read_fred_csv
 from .run_logs import _read_fred_run_log
 
 
-__all__ = ['FREDRun']
-__author__ = ['Duncan Campbell']
+__all__ = ["FREDRun"]
+__author__ = ["Duncan Campbell"]
 
 
-_interval_dirs = {'daily': 'DAILY',
-                  'Weekly': 'WEEKLY'}
+_interval_dirs = {"daily": "DAILY", "Weekly": "WEEKLY"}
 # prefix associated with different state counts
-_count_types = {'count': '',
-                'new': 'new',
-                'cumulative': 'tot'}
+_count_types = {"count": "", "new": "new", "cumulative": "tot"}
 
 
 class FREDRun(object):
@@ -118,14 +115,14 @@ class FREDRun(object):
         params : Dict
             a dictionary of FRED run parameters
         """
-        fname = os.path.join(self.path_to_run, 'parameters.txt')
-        param_file = open(fname, 'r')
+        fname = os.path.join(self.path_to_run, "parameters.txt")
+        param_file = open(fname, "r")
         lines = param_file.readlines()
 
         d = {}
         for line in lines:
             line = line.strip()
-            key, value = line.split(' = ')
+            key, value = line.split(" = ")
             d[key] = _value_str_to_value(value)
         return d
 
@@ -142,19 +139,17 @@ class FREDRun(object):
             a list of datetime date objects
         """
 
-        fname = os.path.join(self.path_to_run, 'DAILY/Date.txt')
+        fname = os.path.join(self.path_to_run, "DAILY/Date.txt")
 
         sim_dates = []
         sim_days = []
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             for line in lines:
                 line = line.strip()
-                sim_day, date_str = line.split(' ')
+                sim_day, date_str = line.split(" ")
                 sim_days.append(int(sim_day))
-                sim_dates.append(
-                    dt.datetime.strptime(date_str, '%Y-%m-%d').date()
-                    )
+                sim_dates.append(dt.datetime.strptime(date_str, "%Y-%m-%d").date())
         return sim_days, sim_dates
 
     def get_log(self) -> List[str]:
@@ -182,25 +177,25 @@ class FREDRun(object):
         Load progress from `progress.txt`.
         """
 
-        fname = os.path.join(self.path_to_run, 'progress.txt')
+        fname = os.path.join(self.path_to_run, "progress.txt")
         progress_pattern = re.compile(r"\((\d+%)\)")
 
         progress = []
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             for line in lines[1:]:
                 line = line.strip()
                 p = progress_pattern.findall(line)[0]
-                progress.append(float(p.strip('%')))
+                progress.append(float(p.strip("%")))
         return progress[-1]
 
     def get_state(
-            self,
-            condition: str,
-            state: str,
-            count_type: str = 'cumulative',
-            interval: str = 'daily'
-            ) -> pd.Series:
+        self,
+        condition: str,
+        state: str,
+        count_type: str = "cumulative",
+        interval: str = "daily",
+    ) -> pd.Series:
         """
         Return an series of state counts in `condition`.
 
@@ -241,12 +236,12 @@ class FREDRun(object):
 
         # check `count_type` keyword argument
         if count_type not in _count_types.keys():
-            msg = (f"`count_type` must be one of {_count_types.keys()}")
+            msg = f"`count_type` must be one of {_count_types.keys()}"
             raise ValueError(msg)
 
         # check `interval` keyword argument
         if interval not in _interval_dirs.keys():
-            msg = (f"`interval` must be one of {_interval_dirs.keys()}")
+            msg = f"`interval` must be one of {_interval_dirs.keys()}"
             raise ValueError(msg)
 
         prefix = _count_types[count_type]
@@ -255,26 +250,24 @@ class FREDRun(object):
         fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
 
         if not os.path.isfile(fname):
-            msg = (f'No output found for {condition}.{prefix}{state} in '
-                   f'{os.path.join(self.path_to_run, _interval_dirs[interval])}.')
+            msg = (
+                f"No output found for {condition}.{prefix}{state} in "
+                f"{os.path.join(self.path_to_run, _interval_dirs[interval])}."
+            )
             raise FileNotFoundError(msg)
 
         # read in data from file
         arr = []
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             count = 0
             for line in lines:
-                sim_time_unit, value = line.split(' ')
+                sim_time_unit, value = line.split(" ")
                 arr.append(_value_str_to_value(value))
                 count += 1
-        return pd.Series(arr, dtype='int')
+        return pd.Series(arr, dtype="int")
 
-    def get_variable(
-            self,
-            variable: str,
-            interval: str = 'daily'
-            ) -> pd.Series:
+    def get_variable(self, variable: str, interval: str = "daily") -> pd.Series:
         """
         Return an series of values for a global variable.
 
@@ -308,33 +301,35 @@ class FREDRun(object):
 
         # check `interval` keyword argument
         if interval not in _interval_dirs.keys():
-            msg = (f"`interval` must be one of {_interval_dirs.keys()}")
+            msg = f"`interval` must be one of {_interval_dirs.keys()}"
             raise ValueError(msg)
 
         fname = f"FRED.{variable}.txt"
         fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
 
         if not os.path.isfile(fname):
-            msg = (f'No output found for {variable} in '
-                   f'{os.path.join(self.path_to_run, _interval_dirs[interval])}')
+            msg = (
+                f"No output found for {variable} in "
+                f"{os.path.join(self.path_to_run, _interval_dirs[interval])}"
+            )
             raise FileNotFoundError(msg)
 
         # read in data from file
         arr = []
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             count = 0
             for line in lines:
-                sim_time_unit, value = line.split(' ')
+                sim_time_unit, value = line.split(" ")
                 arr.append(_value_str_to_value(value))
                 count += 1
-        return pd.Series(arr, dtype='float')
+        return pd.Series(arr, dtype="float")
 
     def get_list_variable(
-            self,
-            variable: str,
-            sim_day: int = None,
-            ) -> pd.Series:
+        self,
+        variable: str,
+        sim_day: int = None,
+    ) -> pd.Series:
         """
         Return an series of values for a global list variable.
 
@@ -369,29 +364,31 @@ class FREDRun(object):
             fname = f"{variable}-{sim_day}.txt"
         else:
             fname = f"{variable}.txt"
-        fname = os.path.join(self.path_to_run, 'LIST', fname)
+        fname = os.path.join(self.path_to_run, "LIST", fname)
 
         if not os.path.isfile(fname):
-            msg = (f"The requested output for `{variable}` was not found in "
-                   f"{os.path.join(self.path_to_run, 'LIST')}")
+            msg = (
+                f"The requested output for `{variable}` was not found in "
+                f"{os.path.join(self.path_to_run, 'LIST')}"
+            )
             raise FileNotFoundError(msg)
 
         # read in data from file
         arr = []
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             count = 0
             for line in lines[1:]:
                 value = line.strip()
                 arr.append(value)
                 count += 1
-        return pd.Series(arr, dtype='float')
+        return pd.Series(arr, dtype="float")
 
     def get_table_variable(
-            self,
-            variable: str,
-            sim_day: int = None,
-            ) -> pd.Series:
+        self,
+        variable: str,
+        sim_day: int = None,
+    ) -> pd.Series:
         """
         Return a table variable as a series.
 
@@ -413,20 +410,22 @@ class FREDRun(object):
             fname = f"{variable}-{sim_day}.txt"
         else:
             fname = f"{variable}.txt"
-        fname = os.path.join(self.path_to_run, 'LIST', fname)
+        fname = os.path.join(self.path_to_run, "LIST", fname)
 
         if not os.path.isfile(fname):
-            msg = (f"The requested output for `{variable}` was not found in "
-                   f"{os.path.join(self.path_to_run, 'LIST')}")
+            msg = (
+                f"The requested output for `{variable}` was not found in "
+                f"{os.path.join(self.path_to_run, 'LIST')}"
+            )
             raise FileNotFoundError(msg)
 
         # read in data from file
         d = {}
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             count = 0
             for line in lines[1:]:
-                key, value = line.strip().split(',')
+                key, value = line.strip().split(",")
                 d[key] = value
                 count += 1
 
@@ -459,8 +458,8 @@ class FREDRun(object):
         >>> run = job.runs[1]
         >>> df = run.get_csv_output('infections.csv')
         """
-        path_to_csv = os.path.join(self.path_to_run, 'CSV', filename)
+        path_to_csv = os.path.join(self.path_to_run, "CSV", filename)
         return _read_fred_csv(path_to_csv)
 
     def __str__(self) -> str:
-        return (f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})")
+        return f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})"

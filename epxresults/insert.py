@@ -9,17 +9,17 @@ from os import PathLike
 from .utils import _path_to_results, return_job_id, load_local_job_keys
 
 
-__all__ = ['merge_fred_results', 'insert_fred_job']
-__author__ = ['Duncan Campbell']
+__all__ = ["merge_fred_results", "insert_fred_job"]
+__author__ = ["Duncan Campbell"]
 
 
 def merge_fred_results(
-        source: PathLike,
-        destination: PathLike = None,
-        force: bool = False,
-        verbose: bool = False,
-        **kwargs
-        ) -> None:
+    source: PathLike,
+    destination: PathLike = None,
+    force: bool = False,
+    verbose: bool = False,
+    **kwargs,
+) -> None:
     """
     Merge a `source` FRED results directory into a `destination`
     FRED results directory.
@@ -55,33 +55,34 @@ def merge_fred_results(
 
     if destination:
         FRED_RESULTS = destination
-        kwargs['FRED_RESULTS'] = FRED_RESULTS
+        kwargs["FRED_RESULTS"] = FRED_RESULTS
     else:
         FRED_RESULTS = _path_to_results(**kwargs)
 
     if source_keys == {}:
-        msg = (f'{source} is either empty or it does not contain a KEY file.')
+        msg = f"{source} is either empty or it does not contain a KEY file."
         raise RuntimeError(msg)
 
     for job_key in source_keys.keys():
         if verbose:
             print(f"Inserting {job_key} into {FRED_RESULTS} ...")
-        path_to_job = os.path.join(source, f'JOB/{source_keys[job_key]}')
-        insert_fred_job(path_to_job, job_key=job_key, force=force,
-                        verbose=verbose, **kwargs)
+        path_to_job = os.path.join(source, f"JOB/{source_keys[job_key]}")
+        insert_fred_job(
+            path_to_job, job_key=job_key, force=force, verbose=verbose, **kwargs
+        )
 
     if verbose:
         print("Done merging FRED results.")
 
 
 def insert_fred_job(
-        PATH_TO_JOB: PathLike,
-        destination: PathLike = None,
-        job_key: str = None,
-        force: bool = False,
-        verbose: bool = False,
-        **kwargs
-        ) -> None:
+    PATH_TO_JOB: PathLike,
+    destination: PathLike = None,
+    job_key: str = None,
+    force: bool = False,
+    verbose: bool = False,
+    **kwargs,
+) -> None:
     """
     Insert a FRED job into a local FRED results directory.
 
@@ -119,15 +120,15 @@ def insert_fred_job(
     """
 
     if job_key is None:
-        fname = os.path.join(PATH_TO_JOB, 'META/KEY')
+        fname = os.path.join(PATH_TO_JOB, "META/KEY")
         if not os.path.isfile(fname):
-            msg = (f"{PATH_TO_JOB} does not contain 'META/KEY'.")
+            msg = f"{PATH_TO_JOB} does not contain 'META/KEY'."
             raise ValueError(msg)
         with open(fname) as f:
             job_key = f.read().strip()
 
     if not _is_valid_fred_job_key(job_key):
-        msg = (f"`job_key` is not a valid potential job key.")
+        msg = f"`job_key` is not a valid potential job key."
         raise ValueError(msg)
 
     if verbose:
@@ -135,17 +136,19 @@ def insert_fred_job(
 
     if destination:
         FRED_RESULTS = destination
-        kwargs['FRED_RESULTS'] = FRED_RESULTS
+        kwargs["FRED_RESULTS"] = FRED_RESULTS
     else:
         FRED_RESULTS = _path_to_results(**kwargs)
 
     local_job_keys = load_local_job_keys(**kwargs)
 
     if (force is False) & (job_key in local_job_keys.keys()):
-        msg = (f"FRED job key '{job_key}' is already present in\n",
-               f"the local FRED results: {FRED_RESULTS}.\n",
-               "To replace this job, set `force=True`.\n",
-               "Otherwise, select a different job key.")
+        msg = (
+            f"FRED job key '{job_key}' is already present in\n",
+            f"the local FRED results: {FRED_RESULTS}.\n",
+            "To replace this job, set `force=True`.\n",
+            "Otherwise, select a different job key.",
+        )
         raise RuntimeError(msg)
 
     # set job ID
@@ -157,11 +160,11 @@ def insert_fred_job(
         else:
             job_id = max(local_job_keys.values()) + 1
 
-    destination = os.path.join(FRED_RESULTS, 'JOB', str(job_id))
+    destination = os.path.join(FRED_RESULTS, "JOB", str(job_id))
 
     if os.path.exists(destination):
         if verbose:
-            print(f'deleting {destination}...')
+            print(f"deleting {destination}...")
         shutil.rmtree(destination)
 
     local_job_keys[job_key] = job_id
@@ -195,16 +198,16 @@ def _write_local_keys(job_keys, **kwargs) -> None:
     job_keys = dict(sorted(job_keys.items(), key=lambda item: item[1]))
 
     # write KEY file
-    filename = os.path.join(FRED_RESULTS, 'KEY')
-    with open(filename, 'w') as f:
+    filename = os.path.join(FRED_RESULTS, "KEY")
+    with open(filename, "w") as f:
         for job_key in job_keys:
             value = job_keys[job_key]
             f.write("{0} {1}\n".format(job_key, value))
 
     # write ID file
-    filename = os.path.join(FRED_RESULTS, 'ID')
-    with open(filename, 'w') as f:
-        if job_keys=={}:
+    filename = os.path.join(FRED_RESULTS, "ID")
+    with open(filename, "w") as f:
+        if job_keys == {}:
             # all jobs have been deleted
             f.write("{0}\n".format(1))
         else:
@@ -229,12 +232,12 @@ def _is_valid_fred_job_key(job_key: str) -> bool:
 
 
 def main():
-    """
-    """
+    """ """
     source = sys.argv[1]
     FRED_RESULTS = _path_to_results()
-    merge_fred_results(source=source, FRED_RESULTS=FRED_RESULTS,
-                       force=True, verbose=True)
+    merge_fred_results(
+        source=source, FRED_RESULTS=FRED_RESULTS, force=True, verbose=True
+    )
 
 
 if __name__ == "__main__":

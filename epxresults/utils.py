@@ -6,14 +6,14 @@ import os
 import re
 from os import PathLike
 from warnings import warn
-from typing import (Dict, List, Optional, Tuple, Union)
+from typing import Dict, List, Optional, Tuple, Union
 from pathlib import Path
 import pandas as pd
 import numpy as np
 
 
-__all__ = ['load_local_job_keys', 'return_job_id', 'return_job_run_ids']
-__author__ = ['Duncan Campbell']
+__all__ = ["load_local_job_keys", "return_job_id", "return_job_run_ids"]
+__author__ = ["Duncan Campbell"]
 
 
 def load_local_job_keys(**kwargs) -> Dict[str, int]:
@@ -60,19 +60,21 @@ def load_local_job_keys(**kwargs) -> Dict[str, int]:
     """
 
     FRED_RESULTS = _path_to_results(**kwargs)
-    filename = os.path.join(FRED_RESULTS, 'KEY')
+    filename = os.path.join(FRED_RESULTS, "KEY")
 
     if os.path.exists(filename) is False:
-        msg = (f"{FRED_RESULTS} does not contain a KEY file. "
-               "Returning an empty dictionary of job keys.")
+        msg = (
+            f"{FRED_RESULTS} does not contain a KEY file. "
+            "Returning an empty dictionary of job keys."
+        )
         warn(msg)
         return {}
 
     keys = {}
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         for line in f:
             key, value = line.strip().split()
-            key = key.decode('utf-8')
+            key = key.decode("utf-8")
             keys[key] = int(value)
     return keys
 
@@ -133,7 +135,7 @@ def return_job_id(job_key, **kwargs) -> int:
         job_id = fred_keys[job_key]
     except KeyError:
         FRED_RESULTS = _path_to_results(**kwargs)
-        msg = (f"The FRED job key '{job_key}' not found in {FRED_RESULTS}.")
+        msg = f"The FRED job key '{job_key}' not found in {FRED_RESULTS}."
         raise KeyError(msg)
 
     return job_id
@@ -191,13 +193,13 @@ def return_job_run_ids(**kwargs) -> List[int]:
 
     PATH_TO_JOB = _path_to_job(**kwargs)
 
-    job_dirs = os.listdir(os.path.join(PATH_TO_JOB, 'OUT'))
+    job_dirs = os.listdir(os.path.join(PATH_TO_JOB, "OUT"))
     run_dir_pattern = re.compile("RUN[0-9]+")
 
     runs = []
     for job_dir in job_dirs:
         if run_dir_pattern.match(job_dir):
-            run = int(job_dir.replace('RUN', ''))
+            run = int(job_dir.replace("RUN", ""))
             runs.append(run)
 
     runs.sort()
@@ -258,28 +260,32 @@ def _path_to_results(**kwargs) -> Path:
     :meta public:
     """
 
-    if 'FRED_RESULTS' in kwargs.keys():
-        FRED_RESULTS = kwargs['FRED_RESULTS']
-        if 'FRED_HOME' in kwargs.keys():
-            msg = ("Both `FRED_HOME` and `FRED_RESULTS` "
-                   "were passed as keyword arguments.\n"
-                   f"Defaulting to `FRED_RESULTS`='{FRED_RESULTS}'")
+    if "FRED_RESULTS" in kwargs.keys():
+        FRED_RESULTS = kwargs["FRED_RESULTS"]
+        if "FRED_HOME" in kwargs.keys():
+            msg = (
+                "Both `FRED_HOME` and `FRED_RESULTS` "
+                "were passed as keyword arguments.\n"
+                f"Defaulting to `FRED_RESULTS`='{FRED_RESULTS}'"
+            )
             warn(msg)
-    elif 'FRED_HOME' in kwargs.keys():
-        FRED_HOME = kwargs['FRED_HOME']
-        FRED_RESULTS = os.path.join(FRED_HOME, 'results')
+    elif "FRED_HOME" in kwargs.keys():
+        FRED_HOME = kwargs["FRED_HOME"]
+        FRED_RESULTS = os.path.join(FRED_HOME, "results")
     else:
         try:
             FRED_RESULTS = _inferred_path_to_results()
         except RuntimeError:
-            msg = ("FRED_RESULTS` or `FRED_HOME` must be passed as a keyword "
-                   "argument or set as a environmental variable.")
+            msg = (
+                "FRED_RESULTS` or `FRED_HOME` must be passed as a keyword "
+                "argument or set as a environmental variable."
+            )
             raise ValueError(msg)
 
     FRED_RESULTS = os.path.abspath(FRED_RESULTS)
 
     if not os.path.isdir(FRED_RESULTS):
-        msg = (f"`FRED_RESULTS`='{FRED_RESULTS}' is not a directory.")
+        msg = f"`FRED_RESULTS`='{FRED_RESULTS}' is not a directory."
         raise FileNotFoundError(msg)
 
     return FRED_RESULTS
@@ -309,30 +315,36 @@ def _inferred_path_to_results() -> None:
     directory is assumed to exist at ``$FRED_HOME/results``.
     """
 
-    FRED_RESULTS = os.getenv('FRED_RESULTS')
+    FRED_RESULTS = os.getenv("FRED_RESULTS")
 
     if FRED_RESULTS is None:
-        FRED_HOME = os.getenv('FRED_HOME')
+        FRED_HOME = os.getenv("FRED_HOME")
         if FRED_HOME is None:
-            msg = ("Neither 'FRED_RESULTS' nor 'FRED_HOME' are set "
-                   "as an environmental variable. As a result, the "
-                   "location of a local FRED results directory could "
-                   "not be inferred.")
+            msg = (
+                "Neither 'FRED_RESULTS' nor 'FRED_HOME' are set "
+                "as an environmental variable. As a result, the "
+                "location of a local FRED results directory could "
+                "not be inferred."
+            )
             raise RuntimeError(msg)
         else:
-            FRED_RESULTS = os.path.join(FRED_HOME, 'results')
-            msg = (f"'FRED_RESULTS' is not set as an environmental variable. "
-                   f"`FRED_RESULTS` will default to '$FRED_HOME/results'."
-                   f"`FRED_RESULTS`='{FRED_RESULTS}'")
+            FRED_RESULTS = os.path.join(FRED_HOME, "results")
+            msg = (
+                f"'FRED_RESULTS' is not set as an environmental variable. "
+                f"`FRED_RESULTS` will default to '$FRED_HOME/results'."
+                f"`FRED_RESULTS`='{FRED_RESULTS}'"
+            )
             warn(msg)
     else:
         pass
 
     if not os.path.isdir(FRED_RESULTS):
-        msg = (f"`FRED_RESULTS`='{FRED_RESULTS}' is not a directory. "
-               f"Ensure that the directory pointed to be the environmental "
-               f"variables 'FRED_RESULTS' and/or 'FRED_HOME' exist on "
-               f"your system.")
+        msg = (
+            f"`FRED_RESULTS`='{FRED_RESULTS}' is not a directory. "
+            f"Ensure that the directory pointed to be the environmental "
+            f"variables 'FRED_RESULTS' and/or 'FRED_HOME' exist on "
+            f"your system."
+        )
         raise FileNotFoundError(msg)
 
     return os.path.abspath(FRED_RESULTS)
@@ -386,29 +398,31 @@ def _path_to_job(**kwargs) -> Path:
     :meta public:
     """
 
-    if 'PATH_TO_JOB' in kwargs.keys():
-        PATH_TO_JOB = os.path.abspath(kwargs['PATH_TO_JOB'])
+    if "PATH_TO_JOB" in kwargs.keys():
+        PATH_TO_JOB = os.path.abspath(kwargs["PATH_TO_JOB"])
         if not os.path.isdir(PATH_TO_JOB):
-            msg = (f"`PATH_TO_JOB`='{PATH_TO_JOB}' does not exist.")
+            msg = f"`PATH_TO_JOB`='{PATH_TO_JOB}' does not exist."
             raise FileNotFoundError(msg)
         return PATH_TO_JOB
 
-    if 'job_id' in kwargs.keys():
-        job_id = kwargs['job_id']
-    elif 'job_key' in kwargs.keys():
+    if "job_id" in kwargs.keys():
+        job_id = kwargs["job_id"]
+    elif "job_key" in kwargs.keys():
         job_id = return_job_id(**kwargs)
     else:
-        msg = ("Either `job_key`, `job_id`, or `PATH_TO_JOB` must be passed "
-               "as keyword arguments.")
+        msg = (
+            "Either `job_key`, `job_id`, or `PATH_TO_JOB` must be passed "
+            "as keyword arguments."
+        )
         ValueError(msg)
 
     PATH_TO_RESULTS = _path_to_results(**kwargs)
-    PATH_TO_JOB = os.path.join(PATH_TO_RESULTS, 'JOB/'+str(job_id))
+    PATH_TO_JOB = os.path.join(PATH_TO_RESULTS, "JOB/" + str(job_id))
     PATH_TO_JOB = os.path.abspath(PATH_TO_JOB)
 
-    FRED_RESULTS = kwargs.get('FRED_RESULTS')
+    FRED_RESULTS = kwargs.get("FRED_RESULTS")
     if not os.path.isdir(PATH_TO_JOB):
-        msg = (f"FRED job ID: '{job_id}' is not present in {FRED_RESULTS}.")
+        msg = f"FRED job ID: '{job_id}' is not present in {FRED_RESULTS}."
         raise FileNotFoundError(msg)
 
     return os.path.abspath(PATH_TO_JOB)
@@ -467,27 +481,28 @@ def _path_to_run(run_id: int = 1, **kwargs) -> Path:
     :meta public:
     """
 
-    if 'PATH_TO_RUN' in kwargs.keys():
-        PATH_TO_RUN = os.path.abspath(kwargs['PATH_TO_RUN'])
+    if "PATH_TO_RUN" in kwargs.keys():
+        PATH_TO_RUN = os.path.abspath(kwargs["PATH_TO_RUN"])
         if not os.path.isdir(PATH_TO_RUN):
-            msg = (f"`PATH_TO_RUN`='{PATH_TO_RUN}' does not exist.")
+            msg = f"`PATH_TO_RUN`='{PATH_TO_RUN}' does not exist."
             FileNotFoundError(msg)
         return PATH_TO_RUN
 
     try:
         PATH_TO_JOB = _path_to_job(**kwargs)
     except ValueError:
-        msg = ("Either `job_key`, `job_id`, `PATH_TO_JOB`, "
-               "or `PATH_TO_RUN` must be passed ",
-               "as keyword arguments.")
+        msg = (
+            "Either `job_key`, `job_id`, `PATH_TO_JOB`, "
+            "or `PATH_TO_RUN` must be passed ",
+            "as keyword arguments.",
+        )
         raise ValueError(msg)
 
-    PATH_TO_RUN = os.path.join(PATH_TO_JOB, 'OUT/'+'RUN'+str(run_id)+'/')
+    PATH_TO_RUN = os.path.join(PATH_TO_JOB, "OUT/" + "RUN" + str(run_id) + "/")
     PATH_TO_RUN = os.path.abspath(PATH_TO_RUN)
 
     if not os.path.isdir(PATH_TO_RUN):
-        msg = (f"Run {run_id} does not exist in "
-               f"{os.path.join(PATH_TO_JOB,'/OUT')}.")
+        msg = f"Run {run_id} does not exist in " f"{os.path.join(PATH_TO_JOB,'/OUT')}."
         raise FileNotFoundError(msg)
 
     return PATH_TO_RUN
@@ -547,24 +562,22 @@ def _read_fred_csv(filepath: Path) -> pd.DataFrame:
         a data frame containing the specified CSV output file contents
     """
 
-    return pd.read_csv(filepath, sep=',', header=0)
+    return pd.read_csv(filepath, sep=",", header=0)
 
 
 def _read_list_variable_file(
-        list_variable_file: Path,
-        list_variable_name: str
-        ) -> pd.DataFrame:
-    """
-    """
+    list_variable_file: Path, list_variable_name: str
+) -> pd.DataFrame:
+    """ """
 
-    with open(list_variable_file, 'r') as f:
+    with open(list_variable_file, "r") as f:
         list_data = f.readlines()
 
     if list_data[0].strip() != list_variable_name:
         raise ValueError(
-            f'Expected file {list_variable_file} to have '
-            f'{list_variable_name} as first line but found {list_data[0]}.'
-            ' Check results.'
+            f"Expected file {list_variable_file} to have "
+            f"{list_variable_name} as first line but found {list_data[0]}."
+            " Check results."
         )
 
     df = pd.DatFrame(np.array([float(x) for x in list_data[1:]]))
@@ -587,11 +600,11 @@ def _is_valid_results_directory(path) -> bool:
         returns True if `path` appears to be a valid FRED results directory
     """
 
-    if not os.path.isdir(os.path.join(path, 'JOB')):
+    if not os.path.isdir(os.path.join(path, "JOB")):
         return False
-    elif not os.path.isfile(os.path.join(path, 'ID')):
+    elif not os.path.isfile(os.path.join(path, "ID")):
         return False
-    elif not os.path.isfile(os.path.join(path, 'KEY')):
+    elif not os.path.isfile(os.path.join(path, "KEY")):
         return False
     else:
         return True

@@ -18,27 +18,24 @@ from .utils import (
     return_job_id,
     return_job_run_ids,
     _is_valid_results_directory,
-    load_local_job_keys
+    load_local_job_keys,
 )
 from .insert import _write_local_keys
 from .run import FREDRun
 from .snapshot import Snapshot
 
-__all__ = ['FREDJob']
-__author__ = ['Duncan Campbell']
+__all__ = ["FREDJob"]
+__author__ = ["Duncan Campbell"]
 
 logger = logging.getLogger(__name__)
 
 
 # job directory storing output for different intervals
-_INTERVAL_DIRS = {'daily': 'OUT/PLOT/DAILY',
-                  'weekly': 'OUT/PLOT/WEEKLY'}
-OutputInterval = Literal['daily', 'weekly']
+_INTERVAL_DIRS = {"daily": "OUT/PLOT/DAILY", "weekly": "OUT/PLOT/WEEKLY"}
+OutputInterval = Literal["daily", "weekly"]
 
 # prefix associated with different state counts
-_count_types = {'count': '',
-                'new': 'new',
-                'cumulative': 'tot'}
+_count_types = {"count": "", "new": "new", "cumulative": "tot"}
 
 
 class FREDJob(object):
@@ -134,7 +131,7 @@ class FREDJob(object):
         returned.
         """
 
-        if 'PATH_TO_JOB' in kwargs.keys():
+        if "PATH_TO_JOB" in kwargs.keys():
             root = Path(self.path_to_job).parent.parent
             if _is_valid_results_directory(root):
                 return root
@@ -179,14 +176,18 @@ class FREDJob(object):
                 del local_keys[self.job_key]
             except KeyError:
                 if verbose:
-                    msg = (f"no job key matching {self.job_key} found in "
-                           f"the local FRED results {self._results_dir}.")
+                    msg = (
+                        f"no job key matching {self.job_key} found in "
+                        f"the local FRED results {self._results_dir}."
+                    )
             try:
                 _write_local_keys(local_keys, FRED_RESULTS=self._results_dir)
             except PermissionError:
-                msg = (f"job {self.job_key} could not be deleted from the "
-                       f"local FRED results directory {self._results_dir}. "
-                       f"You may not have permission to modify the directory.")
+                msg = (
+                    f"job {self.job_key} could not be deleted from the "
+                    f"local FRED results directory {self._results_dir}. "
+                    f"You may not have permission to modify the directory."
+                )
                 raise PermissionError(msg)
 
         # delete job results directory
@@ -195,12 +196,16 @@ class FREDJob(object):
                 print(f"deleting {self.path_to_job}.")
             shutil.rmtree(self.path_to_job)
         except PermissionError:
-            msg = (f"job {self.job_key} could not be deleted."
-                   f"You may not have permission to modify {self.path_to_job}")
+            msg = (
+                f"job {self.job_key} could not be deleted."
+                f"You may not have permission to modify {self.path_to_job}"
+            )
             raise PermissionError(msg)
         except FileNotFoundError:
-            msg = (f"{self.path_to_job} does not exist. It may have been "
-                   "previously deleted.")
+            msg = (
+                f"{self.path_to_job} does not exist. It may have been "
+                "previously deleted."
+            )
             raise FileNotFoundError(msg)
 
     @property
@@ -209,7 +214,7 @@ class FREDJob(object):
         the status of a FRED job
         """
 
-        fname = os.path.join(self.path_to_job, 'META/STATUS')
+        fname = os.path.join(self.path_to_job, "META/STATUS")
         with open(fname) as f:
             status = f.readline().strip()
         self._status = status
@@ -221,16 +226,18 @@ class FREDJob(object):
         a dictionary of FRED run objects associated with this job
         """
 
-        if self.status != 'FINISHED':
+        if self.status != "FINISHED":
             self._runs = {}
             return self._runs
         else:
             self._runs = {}
-            run_ids = return_job_run_ids(job_id=self.job_id,
-                                         PATH_TO_JOB=self.path_to_job)
+            run_ids = return_job_run_ids(
+                job_id=self.job_id, PATH_TO_JOB=self.path_to_job
+            )
             for run_id in run_ids:
-                self._runs[run_id] = FREDRun(run_id=run_id, job_id=self.job_id,
-                                             PATH_TO_JOB=self.path_to_job)
+                self._runs[run_id] = FREDRun(
+                    run_id=run_id, job_id=self.job_id, PATH_TO_JOB=self.path_to_job
+                )
             return self._runs
 
     def _return_job_key(self) -> str:
@@ -243,7 +250,7 @@ class FREDJob(object):
             A FRED job key associated with a FRED job.
         """
 
-        fname = os.path.join(self.path_to_job, 'META/KEY')
+        fname = os.path.join(self.path_to_job, "META/KEY")
         with open(fname) as f:
             key = f.readline().strip()
         return key
@@ -269,12 +276,11 @@ class FREDJob(object):
         FRED Job since the job ID is only used when naming the FRED job
         directory.
         """
-        if 'PATH_TO_JOB' in kwargs.keys():
+        if "PATH_TO_JOB" in kwargs.keys():
             job_id = None
         else:
             FRED_RESULTS = _path_to_results(**kwargs)
-            job_id = return_job_id(job_key=self.job_key,
-                                   FRED_RESULTS=FRED_RESULTS)
+            job_id = return_job_id(job_key=self.job_key, FRED_RESULTS=FRED_RESULTS)
         return job_id
 
     def _parse_vars(self) -> Tuple[List, List]:
@@ -291,17 +297,17 @@ class FREDJob(object):
         global_variables : List
             a list of global variable names
         """
-        fname = os.path.join(self.path_to_job, 'OUT/PLOT/VARS')
+        fname = os.path.join(self.path_to_job, "OUT/PLOT/VARS")
 
         conditions = set()
         global_variables = set()
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
             for line in lines:
                 line = line.strip()
                 try:
-                    condition, state = line.split('.')
-                    if condition == 'FRED':
+                    condition, state = line.split(".")
+                    if condition == "FRED":
                         variable = state
                         global_variables.add(variable)
                     else:
@@ -634,12 +640,8 @@ class FREDJob(object):
                 f"'{interval}' is not a valid interval. Provide one of "
                 f"{', '.join(_INTERVAL_DIRS.keys())}"
             )
-        if not os.path.isdir(
-            os.path.join(self.path_to_job, _INTERVAL_DIRS[interval])
-        ):
-            raise ValueError(
-                f"'{interval}' results were not generated for this job"
-            )
+        if not os.path.isdir(os.path.join(self.path_to_job, _INTERVAL_DIRS[interval])):
+            raise ValueError(f"'{interval}' results were not generated for this job")
         return _INTERVAL_DIRS[interval]
 
     def _parse_snapshots(self) -> List[str]:
@@ -647,9 +649,11 @@ class FREDJob(object):
         collect snapshot filenames in the FRED job.
         """
 
-        snapshots = [f for f in
-                     os.listdir(os.path.join(self.path_to_job, 'OUT'))
-                     if re.match(r'snapshot.*\.tgz$', f)]
+        snapshots = [
+            f
+            for f in os.listdir(os.path.join(self.path_to_job, "OUT"))
+            if re.match(r"snapshot.*\.tgz$", f)
+        ]
         return snapshots
 
     def _set_snapshot_map(self) -> Dict[dt.date, Snapshot]:
@@ -658,9 +662,9 @@ class FREDJob(object):
         """
         self._snapshot_map = {}
         for snapshot_file in self._parse_snapshots():
-            snapshot = Snapshot(PATH_TO_SNAPSHOT=os.path.join(self.path_to_job,
-                                                              'OUT',
-                                                              snapshot_file))
+            snapshot = Snapshot(
+                PATH_TO_SNAPSHOT=os.path.join(self.path_to_job, "OUT", snapshot_file)
+            )
             if snapshot.date is not None:
                 self._snapshot_map[snapshot.date] = snapshot
             else:
@@ -712,8 +716,7 @@ class FREDJob(object):
         try:
             return self._snapshot_map[date]
         except KeyError:
-            msg = (f"There is no snapshot available for simulation "
-                   f"date: {date}.")
+            msg = f"There is no snapshot available for simulation " f"date: {date}."
             raise KeyError(msg)
 
     def get_job_date_table(self) -> pd.DataFrame:
@@ -734,16 +737,15 @@ class FREDJob(object):
         >>> job = FREDJob(job_key='simpleflu')
         >>> df = job.get_job_date_table()
         """
-        return (
-            pd.DataFrame.from_records(
-                chain(*[
+        return pd.DataFrame.from_records(
+            chain(
+                *[
                     zip(repeat(i), self.runs[i].sim_days, self.runs[i].sim_dates)
                     for i in self.runs.keys()
-                ]),
-                columns=["run", "sim_day", "sim_date"]
-            )
-            .assign(sim_date=lambda df: pd.to_datetime(df["sim_date"]))
-        )
+                ]
+            ),
+            columns=["run", "sim_day", "sim_date"],
+        ).assign(sim_date=lambda df: pd.to_datetime(df["sim_date"]))
 
     def __str__(self) -> str:
         return (
