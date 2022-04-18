@@ -6,12 +6,12 @@ import re
 import datetime as dt
 from warnings import warn
 from pathlib import Path
-from typing import (Dict, List, Optional, Tuple, Union)
+from typing import Dict, List, Optional, Tuple, Union
 from .utils import _path_to_job
 
 
-__all__ = ['Snapshot']
-__author__ = ['Duncan Campbell']
+__all__ = ["Snapshot"]
+__author__ = ["Duncan Campbell"]
 
 
 def _path_to_snapshot(date=None, **kwargs) -> Path:
@@ -68,40 +68,45 @@ def _path_to_snapshot(date=None, **kwargs) -> Path:
     :meta public:
     """
 
-    if 'PATH_TO_SNAPSHOT' in kwargs.keys():
-        PATH_TO_SNAPSHOT = os.path.abspath(kwargs['PATH_TO_SNAPSHOT'])
+    if "PATH_TO_SNAPSHOT" in kwargs.keys():
+        PATH_TO_SNAPSHOT = os.path.abspath(kwargs["PATH_TO_SNAPSHOT"])
         if not os.path.isfile(PATH_TO_SNAPSHOT):
-            msg = (f"`PATH_TO_SNAPSHOT`='{PATH_TO_SNAPSHOT}' does not exist.")
+            msg = f"`PATH_TO_SNAPSHOT`='{PATH_TO_SNAPSHOT}' does not exist."
             FileNotFoundError(msg)
         return PATH_TO_SNAPSHOT
 
     try:
         PATH_TO_JOB = _path_to_job(**kwargs)
     except ValueError:
-        msg = ("Either `job_key`, `job_id`, `PATH_TO_JOB`, "
-               "or `PATH_TO_SNAPSHOT` must be passed ",
-               "as keyword arguments.")
+        msg = (
+            "Either `job_key`, `job_id`, `PATH_TO_JOB`, "
+            "or `PATH_TO_SNAPSHOT` must be passed ",
+            "as keyword arguments.",
+        )
         raise ValueError(msg)
 
-    if 'date' in kwargs.keys():
-        date = kwargs['date']
+    if "date" in kwargs.keys():
+        date = kwargs["date"]
         filename = f"snapshot.{date.strftime('%Y-%m-%d')}.tgz"
     else:
         try:
             # completed_snapshots.txt is produced in FRED 7.9 +
-            with open(os.path.join(PATH_TO_JOB, 'OUT',
-                                   'completed-snapshots.txt'), 'r') as f:
+            with open(
+                os.path.join(PATH_TO_JOB, "OUT", "completed-snapshots.txt"), "r"
+            ) as f:
                 last_snapshot = f.readlines()[-1].strip()
         except FileNotFoundError:
-            last_snapshot = 'snapshot.tgz'  # not available in FRED 7.9 +
+            last_snapshot = "snapshot.tgz"  # not available in FRED 7.9 +
         filename = last_snapshot
 
-    PATH_TO_SNAPSHOT = os.path.join(PATH_TO_JOB, 'OUT', filename)
+    PATH_TO_SNAPSHOT = os.path.join(PATH_TO_JOB, "OUT", filename)
     PATH_TO_SNAPSHOT = os.path.abspath(PATH_TO_SNAPSHOT)
 
     if not os.path.isfile(PATH_TO_SNAPSHOT):
-        msg = (f"The requested snapshot, {filename}, does not exist in "
-               f"{os.path.join(PATH_TO_JOB, 'OUT')}.")
+        msg = (
+            f"The requested snapshot, {filename}, does not exist in "
+            f"{os.path.join(PATH_TO_JOB, 'OUT')}."
+        )
         raise FileNotFoundError(msg)
 
     return PATH_TO_SNAPSHOT
@@ -148,12 +153,14 @@ class Snapshot(object):
         deprecated.
         """
 
-        if len(self.filename.split('.')) == 3:
-            date_str = self.filename.split('.')[1]
+        if len(self.filename.split(".")) == 3:
+            date_str = self.filename.split(".")[1]
             self._date = dt.datetime.strptime(date_str, "%Y-%m-%d").date()
         else:
             self._date = None
-            msg = (f"There is no simulation date associated with the "
-                   f"snapshot:{self.filename}.")
+            msg = (
+                f"There is no simulation date associated with the "
+                f"snapshot:{self.filename}."
+            )
             warn(msg)
         return self._date

@@ -4,14 +4,14 @@ tools for reading and processing FRED run logs
 
 import os
 from os import PathLike
-from typing import (Dict, List, Optional, Tuple, Union)
+from typing import Dict, List, Optional, Tuple, Union
 from collections import defaultdict
 from .utils import _path_to_run
 
-FRED_RUN_LOG_FNAME = 'LOG'
+FRED_RUN_LOG_FNAME = "LOG"
 
-__all__ = ['return_fred_run_log']
-__author__ = ['Duncan Campbell']
+__all__ = ["return_fred_run_log"]
+__author__ = ["Duncan Campbell"]
 
 
 def return_fred_run_log(run_id, **kwargs) -> List[str]:
@@ -48,10 +48,13 @@ def return_fred_run_log(run_id, **kwargs) -> List[str]:
     """
 
     # enforce necessary parameters
-    if not any(k in kwargs for k in ['PATH_TO_RUN', 'job_key',
-                                     'job_id', 'PATH_TO_JOB']):
-        msg = ("One of `PATH_TO_RUN`, `job_key`, `job_id`, or `PATH_TO_JOB` "
-               "must be passed as a keyword argument.")
+    if not any(
+        k in kwargs for k in ["PATH_TO_RUN", "job_key", "job_id", "PATH_TO_JOB"]
+    ):
+        msg = (
+            "One of `PATH_TO_RUN`, `job_key`, `job_id`, or `PATH_TO_JOB` "
+            "must be passed as a keyword argument."
+        )
         raise TypeError(msg)
 
     PATH_TO_RUN = _path_to_run(run_id=run_id, **kwargs)
