@@ -71,7 +71,7 @@ This will start a Bash session **inside a container** with all dependencies inst
 
 You will need to be authenticated to our AWS Docker Registry (ECR) to pull the base image. You can find
 [additional information on Confluence](https://epistemix.atlassian.net/wiki/spaces/ES/pages/23265384/AWS)
-or reach out to doug.difilippo@epistemix.com
+or reach out to bob.frankeny@epistemix.com.
 
 ---
 
@@ -112,8 +112,7 @@ ecr-login
 This will place you in a Docker environment. If this fails, please make sure you
 have completed the steps in the section above about developing in Docker.
 
-Within this environment,
-you can then execute:
+Within this environment, you can then execute:
 
 ```terminal
 ./tests/run_tests
