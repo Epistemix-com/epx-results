@@ -4,15 +4,15 @@ Python utilities for spx-results/scripts
 
 import os
 
-__author__ = ['Duncan Campbell']
-__all__ = ['is_docker_env', 'cd']
+__author__ = ["Duncan Campbell"]
+__all__ = ["is_docker_env", "cd"]
 
 
 def is_docker_env() -> bool:
     """
     Is this current environment running in docker?
     """
-    return os.path.exists('/.dockerenv') or _text_in_file('docker', '/proc/self/cgroup')
+    return os.path.exists("/.dockerenv") or _text_in_file("docker", "/proc/self/cgroup")
 
 
 class cd:

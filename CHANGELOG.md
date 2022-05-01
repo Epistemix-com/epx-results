@@ -11,11 +11,18 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ## Added
 
 - added `delete_snapshots()` method to `FREDJob` class.
-- added `delet()` method to `Snapshot` class.
-- added `delete()` method to `FREDJob` class.
-- added a method to `FREDRun`, `get_table_variable`.
+- added `delete()` method to `Snapshot` class.
 
-### Fixed
+## Fixed
+
+## [0.1.0] - 2022-04-20
+
+## Added
+
+- added `delete` method to `FREDJob` class.
+- added a method to FREDRun, get_table_variable, that loads table varibale out for a FRED run.
+
+## Fixed
 
 - fixed a bug in the `insert._write_local_keys` function that cuased an error when
   deleting all jobs in a FRED results directory.

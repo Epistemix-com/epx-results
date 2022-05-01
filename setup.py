@@ -10,7 +10,7 @@ from setuptools.command.develop import develop
 import sys
 import subprocess
 
-if int(pip.__version__.split('.')[0]) < 10:
+if int(pip.__version__.split(".")[0]) < 10:
     from pip import main as pip_main
 else:
     # https://github.com/pypa/pip/issues/5080
@@ -38,12 +38,14 @@ setup(
     author="Duncan Campbell",
     author_email="duncan.campbell@epistemix.com",
     description="Python tools for FRED simulation results manipulation",
-    long_description=("A package which contains python tools for interacting "
-                      "with local FRED simulation results"),
-    install_requires=['pandas', 'pytest'],
+    long_description=(
+        "A package which contains python tools for interacting "
+        "with local FRED simulation results"
+    ),
+    install_requires=["pandas", "pytest"],
     extras_require={"dev": dev_requirements},
     packages=find_packages(),
     url="https://github.com/Epistemix-com/epx-results",
-    package_data={'epxresults': ['VERSION']},
+    package_data={"epxresults": ["VERSION"]},
     cmdclass={},
 )

@@ -140,13 +140,12 @@ class Snapshot(object):
         self.filename = os.path.basename(self.path_to_snapshot)
 
     def delete(self, verbose=False):
-        """
-        """
+        """ """
         # delete snapshot file
         try:
             if verbose:
                 print(f"deleting {self.path_to_snapshot}.")
-            os.remove(path_to_snapshot)
+            os.remove(self.path_to_snapshot)
         except PermissionError:
             msg = (
                 f"The snapshot could not be deleted."
