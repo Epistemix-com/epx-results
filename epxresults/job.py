@@ -719,6 +719,13 @@ class FREDJob(object):
             msg = f"There is no snapshot available for simulation " f"date: {date}."
             raise KeyError(msg)
 
+    def delete_snapshots(self):
+        """
+        delete snapshots associated with this job
+        """
+        for snapshot in self.snapshots:
+            snapshot.delete()
+
     def get_job_date_table(self) -> pd.DataFrame:
         """Table mapping sim days to sim dates for all runs in the job.
 
