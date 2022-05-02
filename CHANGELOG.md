@@ -10,6 +10,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Added
 
+- added `delete_snapshots()` method to `FREDJob` class.
+- added `delete()` method to `Snapshot` class.
+
 ## Fixed
 
 ## [0.1.0] - 2022-04-20

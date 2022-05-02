@@ -139,6 +139,26 @@ class Snapshot(object):
         self.path_to_snapshot = _path_to_snapshot(date=date, **kwargs)
         self.filename = os.path.basename(self.path_to_snapshot)
 
+    def delete(self, verbose=False):
+        """ """
+        # delete snapshot file
+        try:
+            if verbose:
+                print(f"deleting {self.path_to_snapshot}.")
+            os.remove(self.path_to_snapshot)
+        except PermissionError:
+            msg = (
+                f"The snapshot could not be deleted."
+                f"You may not have permission to modify {self.path_to_snapshot}."
+            )
+            raise PermissionError(msg)
+        except FileNotFoundError:
+            msg = (
+                f"{self.path_to_snapshot} does not exist. It may have been "
+                "previously deleted."
+            )
+            raise FileNotFoundError(msg)
+
     @property
     def date(self) -> Union[None, dt.date]:
         """
