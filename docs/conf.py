@@ -10,11 +10,6 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("doc-shared/code"))
-sys.path.insert(0, os.path.abspath("../epxresults"))
-sys.path.insert(0, os.path.abspath("."))
-sys.path.insert(0, os.path.abspath(".."))
-
 # -- Shared settings -----------------------------------------------------
 
 # These environment variable establish base names that are used in sharedconf.py
@@ -27,12 +22,12 @@ os.environ["EPI_PROJECT"] = str("epx-results")
 os.environ["EPI_TITLE"] = str("Epistemix Results")
 os.environ["EPI_SHORT_TITLE"] = str("Epistemix Results")
 
-from sharedconf import *
-
 html_theme_options = {}
 
 # -- Custom settings -----------------------------------------------------
 # You can override the shared defaults here, if necessary
+
+from docshared.sharedconf import *
 
 extensions.remove("sphinx.ext.napoleon")
 extensions = extensions + [
