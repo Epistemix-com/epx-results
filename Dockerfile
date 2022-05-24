@@ -5,14 +5,13 @@
 
 # Image based on 335566905560.dkr.ecr.us-east-1.amazonaws.com/fred-core:latest
 # See https://github.com/Epistemix-com/FRED-tools/ for details
-FROM 335566905560.dkr.ecr.us-east-1.amazonaws.com/fred-tools
+FROM --platform=linux/amd64 ubuntu:22.04
 
-WORKDIR /epx-results
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3-pip python3-venv
 
-COPY ./requirements.txt ./requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --upgrade build twine
 
-RUN pip3 install -r requirements.txt
-
-COPY ./ ./
-
-CMD tox
+CMD sleep infinity

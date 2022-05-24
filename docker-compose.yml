@@ -1,7 +1,7 @@
 services:
   # Service to create development environment with terminal
   dev:
-    image: python:latest
+    build: .
     working_dir: /home/epx-results
     stdin_open: true
     tty: true
