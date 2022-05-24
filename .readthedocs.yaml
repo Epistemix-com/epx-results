@@ -15,11 +15,6 @@ build:
 sphinx:
    configuration: docs/conf.py
 
-submodules:
-  include:
-    - docs/doc-shared
-  recursive: true
-
 # Build docs in PDF in addition to HTML
 formats:
    - pdf
@@ -27,4 +22,4 @@ formats:
 # Set project requirements file
 python:
    install:
-   - requirements: docs/requirements.txt
+   - requirements: docs/rtd_requirements.txt

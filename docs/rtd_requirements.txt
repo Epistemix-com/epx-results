@@ -1,0 +1,8 @@
+-r ../requirements.txt
+sphinx
+recommonmark
+sphinx-rtd-theme
+pydata_sphinx_theme
+sphinx_autodoc_typehints
+numpydoc
+git+https://${GITHUB_USER}:${GITHUB_ACCESS_TOKEN}@github.com/Epistemix-com/doc-shared.git@main
