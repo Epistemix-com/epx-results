@@ -11,6 +11,7 @@ build:
   tools:
     python: "3.8"
   jobs:
+    # Install epx-results before building, otherwise docs will fail to build
     pre_build:
       - pip install .
 
