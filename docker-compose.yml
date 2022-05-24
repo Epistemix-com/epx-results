@@ -1,0 +1,12 @@
+services:
+  # Service to create development environment with terminal
+  dev:
+    image: python:latest
+    working_dir: /home/epx-results
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: .
+        target: /home/epx-results
+    command: /bin/bash
