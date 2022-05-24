@@ -8,5 +8,19 @@ services:
     volumes:
       - type: bind
         source: .
-        target: /home/epx-results
     command: /bin/bash
+
+  # Service to upload to PyPI
+  pypi-upload:
+    build: .
+    working_dir: /home/epx-results
+    environment:
+      - TWINE_USERNAME=${TWINE_USERNAME}
+      - TWINE_PASSWORD=${TWINE_PASSWORD}
+    volumes:
+      - type: bind
+        source: .
+        target: /home/epx-results
+    command: >
+      sh -c "python3 -m build
+             twine upload --skip-existing --repository testpypi dist/*"
