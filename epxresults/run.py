@@ -484,8 +484,8 @@ class FREDRun(object):
 
         Returns
         -------
-        arr : pd.Series
-            a series of floats containing `variable` values indexed by keys
+        G : nx.Graph
+            a NetworkX Graph (or DiGraph) object whose nodes (with associate attributes) and edges (with associated weights) are defined by FRED in a .vna output file.
         """
 
         if sim_day is None:
