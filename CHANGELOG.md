@@ -12,6 +12,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - added `delete_snapshots()` method to `FREDJob` class.
 - added `delete()` method to `Snapshot` class.
+- added `get_network()` method to `FREDRun` class.
+- added `networkx` as a package dependency.
 
 ## Fixed
 
