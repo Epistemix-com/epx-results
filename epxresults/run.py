@@ -6,6 +6,7 @@ import os
 import re
 import pandas as pd
 import datetime as dt
+import networkx as nx
 from typing import Dict, List, Tuple, Union
 from .utils import _path_to_run, _value_str_to_value, _read_fred_csv
 from .run_logs import _read_fred_run_log
@@ -69,8 +70,6 @@ class FREDRun(object):
     -------
     get_log :
         get a FRED run log
-    get_csv_output :
-        get a CSV file output from a FRED run
     get_state :
         get state counts in a condition
     get_variable :
@@ -80,7 +79,9 @@ class FREDRun(object):
     get_table_variable :
         get the value of a table variable
     get_csv_output :
-        load a CSV file
+        get a CSV file output from a FRED run
+    get_network :
+        import a FRED network as a NetworkX Graph
 
     Notes
     -----
@@ -460,6 +461,88 @@ class FREDRun(object):
         """
         path_to_csv = os.path.join(self.path_to_run, "CSV", filename)
         return _read_fred_csv(path_to_csv)
+
+    def get_network(
+        self,
+        network: str,
+        is_directed: bool = True,
+        sim_day: int = None,
+    ) -> nx.Graph:
+        """
+        Return a network as a Graph.
+
+        Parameters
+        ----------
+        network : str
+            a FRED network name
+
+        is_directed : bool
+            indicates whether the network to be loaded is directed. By default, a directed graph (nx.DiGraph) will be returned.
+
+        sim_day : int
+            the simulation day. By default, the last output will be returned.
+
+        Returns
+        -------
+        G : nx.Graph
+            a NetworkX Graph (or DiGraph) object whose nodes (with associate attributes) and edges (with associated weights) are defined by FRED in a .vna output file.
+        """
+
+        if sim_day is None:
+            sim_day = len(self.sim_days)
+
+        fname = f"{network}-{sim_day}.vna"
+        fname = os.path.join(self.path_to_run, fname)
+
+        if not os.path.isfile(fname):
+            msg = (
+                f"The requested output for the network `{network}` on day {sim_day} was not found in "
+                f"{self.path_to_run}\n"
+                f"You may need to either pass a different sim_day or adjust the value of `output_interval` for the network `{network}` in your FRED model."
+            )
+            raise FileNotFoundError(msg)
+
+        # create a Graph or DiGraph object
+        if is_directed:
+            G = nx.DiGraph(name=network)
+        else:
+            G = nx.Graph(name=network)
+
+        # read in data from file
+        with open(fname, "r") as f:
+            lines = f.readlines()
+
+        tie_data_index = lines.index("*tie data\n")
+        node_data = lines[:tie_data_index]
+        tie_data = lines[tie_data_index:]
+
+        # construct a list of nodes
+        node_count = 0
+        nodes = []
+        node_attr_keys = node_data[1].strip().split(" ")[1:]
+        for line in node_data[2:]:
+            line_list = line.strip().split(" ")
+            node_id = line_list[0]
+            node_attrs = line_list[1:]
+            nodes.append((node_id, dict(zip(node_attr_keys, node_attrs))))
+            node_count += 1
+
+        # construct a list of ties
+        tie_count = 0
+        ties = []
+        tie_attr_keys = tie_data[1].strip().split(" ")[2:]
+        for line in tie_data[2:]:
+            line_list = line.strip().split(" ")
+            from_id = line_list[0]
+            to_id = line_list[1]
+            tie_attrs = line_list[2:]
+            ties.append((from_id, to_id, dict(zip(tie_attr_keys, tie_attrs))))
+            tie_count += 1
+
+        G.add_nodes_from(nodes)
+        G.add_edges_from(ties)
+
+        return G
 
     def __str__(self) -> str:
         return f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})"
