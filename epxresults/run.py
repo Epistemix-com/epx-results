@@ -461,7 +461,7 @@ class FREDRun(object):
         """
         path_to_csv = os.path.join(self.path_to_run, "CSV", filename)
         return _read_fred_csv(path_to_csv)
-    
+
     def get_network(
         self,
         network: str,
@@ -475,7 +475,7 @@ class FREDRun(object):
         ----------
         network : str
             a FRED network name
-            
+
         is_directed : bool
             indicates whether the network to be loaded is directed. By default, a directed graph (nx.DiGraph) will be returned.
 
@@ -490,7 +490,7 @@ class FREDRun(object):
 
         if sim_day is None:
             sim_day = len(self.sim_days)
-            
+
         fname = f"{network}-{sim_day}.vna"
         fname = os.path.join(self.path_to_run, fname)
 
@@ -511,7 +511,7 @@ class FREDRun(object):
         # read in data from file
         with open(fname, "r") as f:
             lines = f.readlines()
-            
+
         tie_data_index = lines.index("*tie data\n")
         node_data = lines[:tie_data_index]
         tie_data = lines[tie_data_index:]
@@ -524,9 +524,9 @@ class FREDRun(object):
             line_list = line.strip().split(" ")
             node_id = line_list[0]
             node_attrs = line_list[1:]
-            nodes.append((node_id, dict(zip(node_attr_keys,node_attrs))))
+            nodes.append((node_id, dict(zip(node_attr_keys, node_attrs))))
             node_count += 1
-            
+
         # construct a list of ties
         tie_count = 0
         ties = []
@@ -536,9 +536,9 @@ class FREDRun(object):
             from_id = line_list[0]
             to_id = line_list[1]
             tie_attrs = line_list[2:]
-            ties.append((from_id, to_id, dict(zip(tie_attr_keys,tie_attrs))))
+            ties.append((from_id, to_id, dict(zip(tie_attr_keys, tie_attrs))))
             tie_count += 1
-            
+
         G.add_nodes_from(nodes)
         G.add_edges_from(ties)
 
