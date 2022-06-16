@@ -19,15 +19,15 @@ else:
 PACKAGENAME = "epx-results"
 
 
-def read(file_name):
+def read_version(file_name):
     """Read a text file and return the content as a string."""
     with open(
         os.path.join(os.path.dirname(__file__), file_name), encoding="utf-8"
     ) as f:
-        return f.read()
+        return f.read().strip()
 
 
-VERSION = read("epxresults/VERSION").strip()
+VERSION = read_version("epxresults/VERSION")
 
 dev_requirements = ["tox"]
 

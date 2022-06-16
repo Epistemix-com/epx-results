@@ -7,6 +7,8 @@
 # See https://github.com/Epistemix-com/FRED-tools/ for details
 FROM --platform=linux/amd64 python:latest
 
+RUN apt-get update && apt-get install -y git
+
 RUN pip install --upgrade pip && \
     pip install --upgrade build twine
 
