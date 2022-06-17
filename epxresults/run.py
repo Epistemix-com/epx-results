@@ -435,7 +435,10 @@ class FREDRun(object):
         return pd.Series(d, name=variable)
 
     def get_list_table_variable(
-        self, variable: str, sim_day: int = None, long: bool = False
+        self,
+        variable: str,
+        sim_day: int = None,
+        long: bool = False,
     ) -> pd.Series:
         """
         Return a list_table variable as a series.
