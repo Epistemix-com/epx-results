@@ -433,12 +433,9 @@ class FREDRun(object):
                 count += 1
 
         return pd.Series(d, name=variable)
-    
+
     def get_list_table_variable(
-        self,
-        variable: str,
-        sim_day: int = None,
-        long: bool = False
+        self, variable: str, sim_day: int = None, long: bool = False
     ) -> pd.Series:
         """
         Return a list_table variable as a series.
@@ -450,7 +447,7 @@ class FREDRun(object):
 
         sim_day : int
             the simulation day. By default, the last output will be returned.
-            
+
         long : bool
             indicates whether to return a "long" series (float values indexed by keys which may appear more than once). By default, a "wide" series (lists of float values indexed by keys which appear exactly once) will be returned.
 
@@ -478,7 +475,7 @@ class FREDRun(object):
         i = []
         with open(fname, "r") as f:
             lines = f.readlines()
-            
+
         for line in lines[1:]:
             line_list = line.strip().split(",")
             key = line_list[0]
