@@ -10,7 +10,6 @@ from git.repo.base import Repo
 # Internal imports
 import metadata
 
-logging.getLogger().setLevel(logging.DEBUG)
 
 def execute():
     # Get version from file
@@ -20,9 +19,7 @@ def execute():
         version_from_file = f.read().strip()
 
     # Get release tags
-    logging.debug(f'metadata.ROOTPATH.parent: {metadata.ROOTPATH.parent}')
     repo = Repo(metadata.ROOTPATH.parent)
-    logging.debug(f'repo: {repo}')
     re_str = r"v([0-9]+)\.([0-9]+)\.([0-9]+)"
     release_tags = []
     for tagref in TagReference.list_items(repo):
