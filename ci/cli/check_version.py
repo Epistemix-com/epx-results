@@ -1,5 +1,4 @@
 # Standard imports
-import logging
 import os
 import re
 
@@ -9,6 +8,7 @@ from git.repo.base import Repo
 
 # Internal imports
 import metadata
+from utils import LOG
 
 
 def execute():
@@ -50,11 +50,11 @@ def execute():
 
     # Check that version from file matches a valid version
     if version_from_file not in valid_versions:
-        print(
-            f"VERSION file is invalid: {version_from_file}.\n"
+        LOG.error(
+            f"VERSION file is invalid: {version_from_file}. "
             + f"Expecting one of the following: {valid_versions}"
         )
         os._exit(1)
     else:
-        print(f"VERSION file is valid: {version_from_file}")
+        LOG.info(f"VERSION file is valid: {version_from_file}")
         os._exit(0)
