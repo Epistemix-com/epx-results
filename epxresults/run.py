@@ -328,11 +328,7 @@ class FREDRun(object):
                 count += 1
         return pd.Series(arr, dtype="float")
 
-    def get_list_variable(
-        self,
-        variable: str,
-        sim_day: int = None,
-    ) -> pd.Series:
+    def get_list_variable(self, variable: str, sim_day: int = None,) -> pd.Series:
         """
         Return an series of values for a global list variable.
 
@@ -387,11 +383,7 @@ class FREDRun(object):
                 count += 1
         return pd.Series(arr, dtype="float")
 
-    def get_table_variable(
-        self,
-        variable: str,
-        sim_day: int = None,
-    ) -> pd.Series:
+    def get_table_variable(self, variable: str, sim_day: int = None,) -> pd.Series:
         """
         Return a table variable as a series.
 
@@ -433,12 +425,9 @@ class FREDRun(object):
                 count += 1
 
         return pd.Series(d, name=variable)
-    
+
     def get_list_table_variable(
-        self,
-        variable: str,
-        sim_day: int = None,
-        long: bool = False
+        self, variable: str, sim_day: int = None, long: bool = False
     ) -> pd.Series:
         """
         Return a list_table variable as a series.
@@ -478,7 +467,7 @@ class FREDRun(object):
         i = []
         with open(fname, "r") as f:
             lines = f.readlines()
-            
+
         for line in lines[1:]:
             line_list = line.strip().split(",")
             key = line_list[0]
@@ -523,10 +512,7 @@ class FREDRun(object):
         return _read_fred_csv(path_to_csv)
 
     def get_network(
-        self,
-        network: str,
-        is_directed: bool = True,
-        sim_day: int = None,
+        self, network: str, is_directed: bool = True, sim_day: int = None,
     ) -> nx.Graph:
         """
         Return a network as a Graph.
