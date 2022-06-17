@@ -1,0 +1,21 @@
+name: Open Release Pull Request
+
+on:
+  pull_request:
+    types: [labeled]
+    branches:
+      - main
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.label.name == 'release' }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Get tag information
+        run: git fetch --tags --force origin
+
+      - name: Check that VERSION file is valid
+        run: docker-compose run check_version

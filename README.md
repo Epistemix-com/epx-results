@@ -29,20 +29,18 @@ You may then import epx-results in Python,
 ### Local Development
 
 To set up a fresh development environment to to work on `epx-results`, we
-recommend using Python's built in `venv` module to create a fresh virtual
-environment. This helps to ensure that if something stops working in the
-development environment, the explanation is inside the `epx-results` repository
-itself, rather than because of some other software installed in a general
-purpose environment.
+recommend using Python's built in
+[`venv`](https://docs.python.org/3/library/venv.html) module to create a fresh
+virtual environment. This helps to ensure that if something stops working in
+the development environment, the explanation is inside the `epx-results`
+repository itself, rather than because of some other software installed in a
+general purpose environment.
 
 Start by activating a Python environment containing a Python
 executable with the same version you want to use for package development (e.g.
 3.8).
 
 ```shell
-$ conda activate epistemix-modeling
-$ which python 
-/opt/miniconda3/envs/epistemix-modeling/bin/python
 $ python -m venv .venv
 $ source .venv/bin/activate
 $ which python
@@ -58,10 +56,14 @@ pip install -e .
 
 ### Local Development with Docker
 
-You can develop locally via [Docker](https://www.docker.com).
+You can develop locally via [Docker](https://www.docker.com). It is also
+recommended to install [Docker
+Compose](https://docs.docker.com/compose/gettingstarted/) to streamline local
+development with Docker.
 
+To develop inside a container, run the following:
 ```terminal
-$user: ./scripts/dev
+docker-compose run --rm dev
 ```
 
 This will start a Bash session **inside a container** with all dependencies installed and the local epx-results source code mounted as a volume. This allows you to edit code on your machine and execute it within the container.
@@ -106,7 +108,7 @@ To run the testing suite in a Docker environment, execute:
 
 ```terminal
 ecr-login
-./scripts/dev
+docker-compose run --rm dev
 ```
 
 This will place you in a Docker environment. If this fails, please make sure you
@@ -131,3 +133,22 @@ python ./scripts/generate-test-data.py
 ```
 
 This script runs example model(s), generating an example FRED results directory in `./tests/fred-results`.
+
+### Release Process
+We use [Semantic Versioning](https://semver.org/spec/v2.0.0.html), and keep a
+`CHANGELOG.md` file to track changes to `epx-results`.
+
+Create a new pull request into `main` with the label "release". This will
+trigger a GitHub Actions workflow to verify the validity of the
+`epxresults/VERSION` file. The workflow will fail if the version number is
+invalid. Once the workflow succeeds, the release PR can be successfully merged
+into the `main` branch. Also update the `CHANGELOG.md` as necessary.
+
+Create the release on GitHub. From the `epx-results` [repo
+page](https://github.com/Epistemix-com/epx-results) click:
+- 'Releases'
+- 'Draft a new release'
+- Select the newly created tag from the 'Select a tag' dropdown
+
+Name the release something like 'epx-results v1.0.0', and copy the release
+notes from the `CHANGELOG.md` into the description box.
