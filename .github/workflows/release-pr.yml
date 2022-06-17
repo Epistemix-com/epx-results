@@ -1,4 +1,4 @@
-name: Release Pull Request Open
+name: Open Release Pull Request
 
 on:
   pull_request:
@@ -6,12 +6,11 @@ on:
     branches:
       - main
 
-# TODO: Check release label
-
 jobs:
   check_version:
     runs-on: ubuntu:latest
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.pull_request.draft == false &&
+            github.event.label.name == 'release' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
