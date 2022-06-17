@@ -14,5 +14,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Get tag information
+        run: git fetch --tags --force origin
+
       - name: Check that VERSION file is valid
         run: docker-compose run check_version
