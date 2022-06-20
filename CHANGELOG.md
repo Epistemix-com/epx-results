@@ -14,6 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - added `delete()` method to `Snapshot` class.
 - added `get_network()` method to `FREDRun` class.
 - added `networkx` as a package dependency.
+- added `get_list_table_variable()` method to `FREDRun` class.
 
 ## Fixed
 
