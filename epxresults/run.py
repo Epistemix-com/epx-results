@@ -438,7 +438,7 @@ class FREDRun(object):
         self,
         variable: str,
         sim_day: int = None,
-        long: bool = False,
+        format: str = "long",
     ) -> pd.Series:
         """
         Return a list_table variable as a series.
@@ -451,8 +451,9 @@ class FREDRun(object):
         sim_day : int
             the simulation day. By default, the last output will be returned.
 
-        long : bool
-            indicates whether to return a "long" series (float values indexed by keys which may appear more than once). By default, a "wide" series (lists of float values indexed by keys which appear exactly once) will be returned.
+        format : str, optional
+            the Series format to be returned, either 'wide' (lists of float values indexed by keys which appear exactly once) or 'long' (float values indexed by keys which may appear more than once).
+            By default, long format Series are returned.
 
         Returns
         -------
@@ -483,12 +484,18 @@ class FREDRun(object):
             line_list = line.strip().split(",")
             key = line_list[0]
             values = line_list[1:]
-            if long:
+            if format == "long":
                 i.extend([key for _ in range(len(values))])
                 d.extend(values)
-            else:
+            elif format == "wide":
                 i.append(key)
                 d.append(values)
+            else:
+                msg = (
+                    f"The output format '{format}' for `{variable}` is not a valid option. "
+                    f"The valid options are 'long' and 'wide'."
+                )
+                raise ValueError(msg)
 
         return pd.Series(data=d, index=i, name=variable)
 
