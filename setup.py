@@ -29,7 +29,7 @@ def read_version(file_name):
 
 VERSION = read_version("epxresults/VERSION")
 
-dev_requirements = ["tox"]
+dev_requirements = ["tox", "black"]
 
 setup(
     name=PACKAGENAME,
