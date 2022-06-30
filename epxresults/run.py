@@ -73,9 +73,9 @@ class FREDRun(object):
     get_state :
         get state counts in a condition
     get_variable :
-        get the value of a global variable
+        get the value of a shared variable
     get_list_variable :
-        get the value of a global list variable
+        get the value of a shared list variable
     get_table_variable :
         get the value of a table variable
     get_list_table_variable :
@@ -272,12 +272,12 @@ class FREDRun(object):
 
     def get_variable(self, variable: str, interval: str = "daily") -> pd.Series:
         """
-        Return an series of values for a global variable.
+        Return an series of values for a shared variable.
 
         Parameters
         ----------
         variable : str
-            a FRED global variable name
+            a FRED shared variable name
 
         interval : str
             the output interval
@@ -289,7 +289,7 @@ class FREDRun(object):
 
         Examples
         --------
-        In the ``'simpleflu'`` model, there are a set of global variables,
+        In the ``'simpleflu'`` model, there are a set of shared variables,
         ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
         number of agents who are susceptible to the ``INF`` condition,
         infected, and recovered.
@@ -334,12 +334,12 @@ class FREDRun(object):
         sim_day: int = None,
     ) -> pd.Series:
         """
-        Return an series of values for a global list variable.
+        Return an series of values for a shared list variable.
 
         Parameters
         ----------
         variable : str
-            a FRED global list variable name
+            a FRED shared list variable name
 
         sim_day : int
             the simulation day. By default, the last output will be returned.
@@ -351,7 +351,7 @@ class FREDRun(object):
 
         Examples
         --------
-        In the ``'simpleflu'`` model, there are a set of global list variables,
+        In the ``'simpleflu'`` model, there are a set of shared list variables,
         ``g_list_of_case_count_by_age`` and ``g_list_of_symp_count_by_age``
         that count the number agents who are infected and symptomatic in age
         bins.
