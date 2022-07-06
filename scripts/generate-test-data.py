@@ -59,19 +59,22 @@ def main():
     """ """
 
     if is_docker_env():
-        print(f"Running in a docker environment...")
-        if os.environ.keys() <= ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]:
-            print("The `AWS_ACCESS_KEY_ID` env variable must be non-empty.")
-            print("The `AWS_SECRET_ACCESS_KEY` env variable must be non-empty.")
-        p = subprocess.run(["fred_install_location_codes.py", "Jefferson_County_PA"])
-        if p.returncode == 0:
-            print("Sucesfully downloaed location data.")
-        else:
-            print(
-                "Failed to download location data. Make sure that the"
-                "`fred_install_location_codes.py` script is availabe in "
-                "your Docker environment."
-            )
+        try:
+            print(f"Running in a docker environment...")
+            if os.environ.keys() <= ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]:
+                print("The `AWS_ACCESS_KEY_ID` env variable must be non-empty.")
+                print("The `AWS_SECRET_ACCESS_KEY` env variable must be non-empty.")
+            p = subprocess.run(["fred_install_location_codes.py", "Jefferson_County_PA"])
+            if p.returncode == 0:
+                print("Sucessfully downloaded location data.")
+            else:
+                print(
+                    "Failed to download location data. Make sure that the"
+                    "`fred_install_location_codes.py` script is availabe in "
+                    "your Docker environment."
+                )
+        except:
+            pass
 
     print(f"Running FRED model(s) to generate test data in `{PKG_FRED_RESULTS}`.")
 
