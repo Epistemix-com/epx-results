@@ -73,7 +73,7 @@ class FREDRun(object):
     get_state :
         get state counts in a condition
     get_variable :
-        get the value of a shared variable
+        get the value of a shared numeric variable
     get_list_variable :
         get the value of a shared list variable
     get_table_variable :
@@ -272,12 +272,12 @@ class FREDRun(object):
 
     def get_variable(self, variable: str, interval: str = "daily") -> pd.Series:
         """
-        Return an series of values for a shared variable.
+        Return a series of values for a shared numeric variable.
 
         Parameters
         ----------
         variable : str
-            a FRED shared variable name
+            a FRED shared numeric variable name
 
         interval : str
             the output interval
@@ -289,7 +289,7 @@ class FREDRun(object):
 
         Examples
         --------
-        In the ``'simpleflu'`` model, there are a set of shared variables,
+        In the ``'simpleflu'`` model, there are a set of shared numeric variables,
         ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
         number of agents who are susceptible to the ``INF`` condition,
         infected, and recovered.
