@@ -552,6 +552,40 @@ class FREDJob(object):
             df = self._convert_wide_plot_table_to_long(df, "Gt")
         return df
 
+    def get_job_population_size_table(
+        self,
+        interval: OutputInterval = "daily",
+        format: str = "long",
+    ) -> pd.DataFrame:
+        """
+        Return a table of population sizes for each run in a job.
+
+        Parameters
+        ----------
+        interval : str
+            the output interval
+
+        format : str, optional
+            the default DataFrame format, either 'wide' or 'long'. By default,
+            long format DataFrames are returned.
+
+        Returns
+        -------
+        pop_size_table : pandas.DataFrame
+            a pandas DataFrame containing population size values
+            for each run in the job.
+        """
+
+        # load dataframe in wide format
+        df = pd.concat([run.get_population_size().rename(f"RUN{run.run_id}")
+                        for run in self.runs.values()], axis=1)
+
+        self._validate_table_format(format)
+        if format == "long":
+            df = self._convert_wide_plot_table_to_long(df, "PopSize")
+
+        return df
+
     def _read_plot_data_file(
         self, filename: str, interval: OutputInterval
     ) -> pd.DataFrame:
