@@ -54,3 +54,17 @@ services:
     command: >
       sh -c "pip install -r ci/requirements.txt
              python3 ci check_version"
+
+  # Run tests for epx-results
+  test:
+    build: .
+    working_dir: /mnt/epx-results
+    volumes:
+      - type: bind
+        source: .
+        target: /mnt/epx-results
+    command: >
+      sh -c "pip install .
+             python3 ./scripts/generate-test-data.py
+             pytest"
+

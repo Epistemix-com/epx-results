@@ -65,7 +65,7 @@ def main():
             print("The `AWS_SECRET_ACCESS_KEY` env variable must be non-empty.")
         p = subprocess.run(["fred_install_location_codes.py", "Jefferson_County_PA"])
         if p.returncode == 0:
-            print("Sucesfully downloaed location data.")
+            print("Sucessfully downloaded location data.")
         else:
             print(
                 "Failed to download location data. Make sure that the"
