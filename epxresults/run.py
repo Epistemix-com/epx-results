@@ -84,6 +84,8 @@ class FREDRun(object):
         get a CSV file output from a FRED run
     get_network :
         import a FRED network as a NetworkX Graph
+    get_population_size : 
+        get the total population size
 
     Notes
     -----
@@ -610,6 +612,61 @@ class FREDRun(object):
         G.add_edges_from(ties)
 
         return G
+
+    def get_population_size(self, interval: str = "daily") -> pd.Series:
+        """
+        Return a series of population size.
+
+        Parameters
+        ----------
+        interval : str
+            the output interval
+
+        Returns
+        -------
+        ser : pd.Series
+            a series of floats containing `variable` values
+
+        Examples
+        --------
+        In the ``'simpleflu'`` model, there are a set of shared numeric variables,
+        ``Susceptible``, ``Infected``, and ``Recovered`` that track the daily
+        number of agents who are susceptible to the ``INF`` condition,
+        infected, and recovered.
+
+        The daily number of infected agents in run on each day of the
+        simulation can be loaded as:
+
+        >>> from epxresults import FREDRun
+        >>> run = FREDRun(job_key='simpleflu', run_id=1)
+        >>> pop_size = run.get_population_size()
+        """
+
+        # check `interval` keyword argument
+        if interval not in _interval_dirs.keys():
+            msg = f"`interval` must be one of {_interval_dirs.keys()}"
+            raise ValueError(msg)
+
+        fname = "Popsize.txt"
+        fname = os.path.join(self.path_to_run, _interval_dirs[interval], fname)
+
+        if not os.path.isfile(fname):
+            msg = (
+                f"No output found for population size in "
+                f"{os.path.join(self.path_to_run, _interval_dirs[interval])}"
+            )
+            raise FileNotFoundError(msg)
+
+        # read in data from file
+        arr = []
+        with open(fname, "r") as f:
+            lines = f.readlines()
+            count = 0
+            for line in lines:
+                sim_time_unit, value = line.split(" ")
+                arr.append(_value_str_to_value(value))
+                count += 1
+        return pd.Series(arr, dtype="int")
 
     def __str__(self) -> str:
         return f"FREDRun(run_id={self.run_id}, path_to_run={self.path_to_run})"
