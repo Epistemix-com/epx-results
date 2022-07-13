@@ -1,0 +1,71 @@
+
+variables {
+    global vaccine_delay
+    vaccine_delay = 0
+
+    global initial_vaccines
+    initial_vaccines = 0.1
+
+    global vaccine_effectiveness
+    vaccine_effectiveness = 0.8
+
+    global days_until_effective
+    days_until_effective = 14
+
+    global willing_to_consider
+    willing_to_consider = 0.5
+}
+
+
+condition INFLUENZA_VACCINE {
+    meta_start_state = ImportStart
+    transmission_mode = proximity
+    exposed_state = Decide
+    transmissibility = 1
+
+    state Start {
+        wait(0)
+        next(Considering) with prob(willing_to_consider)
+        default(Excluded)
+    }
+
+    state Considering {
+        INFLUENZA_VACCINE.sus = 1
+        wait()
+        next()
+    }
+
+    state Decide {
+        INFLUENZA_VACCINE.sus = 0
+        wait(24)
+        next(Taker)
+    }
+
+    state Taker {
+        wait(24 * days_until_effective)
+        next(Immune) with prob(vaccine_effectiveness)
+        default(Failed)
+    }
+
+    state Immune {
+        INFLUENZA.sus = 0
+        wait()
+        next()
+    }
+
+    state Failed {
+        wait()
+        next()
+    }
+
+    state ImportStart {
+        wait(24 * vaccine_delay)
+        next(ImportVaccine)
+    }
+
+    state ImportVaccine {
+        import_per_capita(initial_vaccines)
+        wait()
+        next()
+    }
+}

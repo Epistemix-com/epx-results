@@ -1,0 +1,15 @@
+{
+    "jobs": [
+        {
+            "key": "simpleflu",
+            "entrypoint": "simple_flu/main.fred",
+            "runs": 2
+        },
+        {
+            "key": "simpleflu_with_vaccine",
+            "entrypoint": "vaccine/main.fred",
+            "runs": 3
+        }
+    ],
+    "cores": 2
+}

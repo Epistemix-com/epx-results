@@ -84,7 +84,7 @@ class FREDRun(object):
         get a CSV file output from a FRED run
     get_network :
         import a FRED network as a NetworkX Graph
-    get_population_size : 
+    get_population_size :
         get the total population size
 
     Notes

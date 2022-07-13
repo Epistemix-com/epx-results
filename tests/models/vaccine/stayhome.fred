@@ -1,0 +1,23 @@
+
+condition STAY_HOME {
+    start_state = No
+
+    state No {}
+
+    state Yes {
+        absent()
+        present(Household)
+        wait()
+        next()
+    }
+}
+
+
+state INFLUENZA.InfectiousSymptomatic {
+    if (bernoulli(0.5)==1) then set_state(STAY_HOME,Yes)
+}
+
+
+state INFLUENZA.Recovered {
+    set_state(STAY_HOME,No)
+}

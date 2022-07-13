@@ -577,8 +577,13 @@ class FREDJob(object):
         """
 
         # load dataframe in wide format
-        df = pd.concat([run.get_population_size().rename(f"RUN{run.run_id}")
-                        for run in self.runs.values()], axis=1)
+        df = pd.concat(
+            [
+                run.get_population_size().rename(f"RUN{run.run_id}")
+                for run in self.runs.values()
+            ],
+            axis=1,
+        )
 
         self._validate_table_format(format)
         if format == "long":

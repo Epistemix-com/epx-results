@@ -1,0 +1,51 @@
+#####################################################
+# Simple influenza model
+# Author: John Grefenstette
+# Date: 22 Jul 2019
+
+
+condition INFLUENZA {
+    transmission_mode = proximity
+    transmissibility = 1.0
+    start_state = Susceptible
+    exposed_state = Exposed
+    meta_start_state = Import
+
+    state Susceptible {
+        INFLUENZA.sus = 1
+        wait()
+        next()
+    }
+
+    state Exposed {
+        INFLUENZA.sus = 0
+        wait(24*lognormal(1.9,1.23))
+        next(InfectiousAsymptomatic) with prob(0.33)
+        default(InfectiousSymptomatic)
+    }
+
+    state InfectiousSymptomatic {
+        INFLUENZA.trans = 1
+        wait(24* lognormal(5.0,1.5))
+        next(Recovered)
+    }
+
+    state InfectiousAsymptomatic {
+        INFLUENZA.trans = 0.5
+        wait( 24 * lognormal(5.0, 1.5) )
+        next(Recovered)
+    }
+
+    state Recovered {
+        INFLUENZA.trans = 0
+        wait()
+        next()
+    }
+
+    state Import {
+        import_count(10)
+        wait()
+        next()
+    }
+}
+
