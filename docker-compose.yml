@@ -9,6 +9,9 @@ services:
       - type: bind
         source: .
         target: /mnt/epx-results
+    environment:
+      - USER=root
+    user: root
     command: /bin/bash
 
   # Service to upload to the test PyPI repository

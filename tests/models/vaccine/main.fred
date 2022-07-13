@@ -16,6 +16,7 @@ include vaccine.fred
 variables {
     global flu_delay
     flu_delay = 90
+    flu_delay.output = 1
 }
 
 condition INFLUENZA {

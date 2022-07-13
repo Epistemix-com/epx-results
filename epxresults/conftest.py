@@ -31,4 +31,4 @@ def fred_results() -> str:
 
 @pytest.fixture(autouse=True)
 def pkg_test_env(monkeypatch):
-    monkeypatch.setenv("FRED_RESULTS", fred_results())
+    monkeypatch.setenv("FRED_RESULTS", '/opt/FRED/results')
