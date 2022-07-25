@@ -69,6 +69,10 @@ class FREDJob(object):
     ----------
     status : str:
         status of the job (e.g. 'FINISHED')
+    start_time : datetime.datetime
+        the time when the job started
+    finish_time : datetime.datetime
+        the time when the job finished
     runs : Dict[int, FREDRun]
         collection of runs belonging to the job. Keys are the FRED run
         ID numbers, values are `FREDRun` objects representing the runs.
@@ -91,7 +95,9 @@ class FREDJob(object):
         Get a table of state counts in a condition for each run in a job.
     get_job_date_table :
         Mapping of simulation days to simulation dates.
-
+    get_job_duration :
+        Compute the length of time it took for a job to complete 
+        
     Notes
     -----
     For details on how the path to a FRED job is resolved,
@@ -219,6 +225,52 @@ class FREDJob(object):
             status = f.readline().strip()
         self._status = status
         return status
+
+    @property
+    def start_time(self) -> dt.datetime:
+        """
+        the start time of a FRED job
+        """
+
+        fname = os.path.join(self.path_to_job, "META/START")
+        with open(fname) as f:
+            start_string = f.readline().strip()
+
+        start_time = dt.datetime.strptime(start_string, "%a %b %d %H:%M:%S %Z %Y")
+        self._start_time = start_time
+        return start_time
+
+    @property
+    def finish_time(self) -> dt.datetime:
+        """
+        the finish time of a FRED job
+        """
+
+        if self.status != "FINISHED":
+            msg = f"Job {self.job_id} has not finished yet."
+            raise RuntimeError(msg)
+
+        fname = os.path.join(self.path_to_job, "META/FINISHED")
+        with open(fname) as f:
+            finish_string = f.readline().strip()
+
+        finish_time = dt.datetime.strptime(finish_string, "%a %b %d %H:%M:%S %Z %Y")
+        self._finish_time = finish_time
+        return finish_time
+
+    def get_job_duration(self):
+        """
+        Return the time in seconds between the start time and finish time of this job.
+
+        Returns
+        -------
+        duration : int
+            Number of seconds between self.start_time and self.finish_time.
+        """
+
+        duration = int((self.finish_time - self.start_time).total_seconds())
+
+        return duration
 
     @property
     def runs(self) -> Dict[int, FREDRun]:
@@ -410,10 +462,7 @@ class FREDJob(object):
         return df
 
     def get_job_variable_table(
-        self,
-        variable: str,
-        interval: OutputInterval = "daily",
-        format: str = "long",
+        self, variable: str, interval: OutputInterval = "daily", format: str = "long",
     ) -> pd.DataFrame:
         """
         Return a table of `variable` values for each run in a job.
@@ -553,9 +602,7 @@ class FREDJob(object):
         return df
 
     def get_job_population_size_table(
-        self,
-        interval: OutputInterval = "daily",
-        format: str = "long",
+        self, interval: OutputInterval = "daily", format: str = "long",
     ) -> pd.DataFrame:
         """
         Return a table of population sizes for each run in a job.
@@ -577,8 +624,13 @@ class FREDJob(object):
         """
 
         # load dataframe in wide format
-        df = pd.concat([run.get_population_size().rename(f"RUN{run.run_id}")
-                        for run in self.runs.values()], axis=1)
+        df = pd.concat(
+            [
+                run.get_population_size().rename(f"RUN{run.run_id}")
+                for run in self.runs.values()
+            ],
+            axis=1,
+        )
 
         self._validate_table_format(format)
         if format == "long":
