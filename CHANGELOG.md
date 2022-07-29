@@ -17,6 +17,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - added `get_list_table_variable()` method to `FREDRun` class.
 - added `get_population_size()` method to `FREDRun` class.
 - added `get_job_population_size_table()` method to `FREDJob` class.
+- added `start_time` and `finish_time` properties to `FREDJob` class.
+- added `get_job_duration()` method to `FREDJob` class.
 
 ## Fixed
 
