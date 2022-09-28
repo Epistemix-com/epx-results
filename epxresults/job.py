@@ -236,7 +236,7 @@ class FREDJob(object):
         with open(fname) as f:
             start_string = f.readline().strip()
 
-        start_time = dt.datetime.strptime(start_string, "%a %b %d %H:%M:%S %Z %Y")
+        start_time = dt.datetime.strptime(start_string, "%a %b %d %I:%M:%S %p %Z %Y")
         self._start_time = start_time
         return start_time
 
@@ -254,7 +254,7 @@ class FREDJob(object):
         with open(fname) as f:
             finish_string = f.readline().strip()
 
-        finish_time = dt.datetime.strptime(finish_string, "%a %b %d %H:%M:%S %Z %Y")
+        finish_time = dt.datetime.strptime(finish_string, "%a %b %d %I:%M:%S %p %Z %Y")
         self._finish_time = finish_time
         return finish_time
 
